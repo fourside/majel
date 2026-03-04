@@ -7,8 +7,8 @@ import { speak } from "./04_speak.ts";
 async function runOnce(): Promise<void> {
   const totalStart = performance.now();
 
-  // 1. 録音
-  const wavPath = await record({ duration: 0 }); // 無音検出で自動停止
+  // 1. 録音 (5秒固定)
+  const wavPath = await record({ duration: 5, output: "/tmp/majel_input.wav" });
 
   // 2. 音声認識
   const userText = await transcribe(wavPath);
@@ -27,18 +27,27 @@ async function runOnce(): Promise<void> {
   console.log(`--- Total: ${totalElapsed}ms ---\n`);
 }
 
+async function waitForEnter(): Promise<void> {
+  const reader = Deno.stdin.readable.getReader();
+  try {
+    while (true) {
+      const { value } = await reader.read();
+      if (value && value.includes(10)) break; // 10 = '\n'
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+
 async function main(): Promise<void> {
   console.log("=== MAJEL Voice Assistant (Phase 0) ===");
   console.log("Press Enter to start recording, Ctrl+C to quit.\n");
 
-  const buf = new Uint8Array(1);
-
   while (true) {
-    // Enter キー待ち
     Deno.stdout.writeSync(
       new TextEncoder().encode("Ready. Press Enter to speak > "),
     );
-    await Deno.stdin.read(buf);
+    await waitForEnter();
 
     try {
       await runOnce();

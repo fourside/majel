@@ -2,7 +2,7 @@ import "jsr:@std/dotenv/load";
 
 type TTSEngine = "voicevox" | "openai";
 
-const DEFAULT_ENGINE: TTSEngine = "voicevox";
+const DEFAULT_ENGINE: TTSEngine = "openai";
 
 async function synthesizeVoicevox(
   text: string,
@@ -69,32 +69,46 @@ export async function speak(
   const elapsed = Math.round(performance.now() - start);
   console.log(`Synthesized (${elapsed}ms), playing...`);
 
-  // WSL Ubuntu では aplay で再生
-  const cmd = new Deno.Command("aplay", {
-    args: [tmpFile],
+  // WSL パスを Windows パスに変換
+  const wslpathCmd = new Deno.Command("wslpath", {
+    args: ["-w", tmpFile],
+    stdout: "piped",
+  });
+  const { stdout: wslpathOut } = await wslpathCmd.output();
+  const winSrc = new TextDecoder().decode(wslpathOut).trim();
+
+  // Windows 側の一時ファイルにコピーして再生 (MediaPlayer は 24kHz WAV に対応)
+  const cmd = new Deno.Command("powershell.exe", {
+    args: [
+      "-NoProfile",
+      "-Command",
+      [
+        `Add-Type -AssemblyName PresentationCore`,
+        `$tmp = Join-Path $env:TEMP 'majel_response.wav'`,
+        `Copy-Item -LiteralPath '${winSrc.replace(/'/g, "''")}' -Destination $tmp -Force`,
+        `$p = New-Object System.Windows.Media.MediaPlayer`,
+        `$p.Open([Uri]::new($tmp))`,
+        `Start-Sleep -Milliseconds 200`,
+        `$p.Play()`,
+        `while ($p.NaturalDuration.HasTimeSpan -eq $false) { Start-Sleep -Milliseconds 100 }`,
+        `Start-Sleep -Milliseconds ([int]$p.NaturalDuration.TimeSpan.TotalMilliseconds + 200)`,
+        `$p.Close()`,
+        `Remove-Item $tmp -Force -ErrorAction SilentlyContinue`,
+      ].join("; "),
+    ],
     stdout: "null",
     stderr: "piped",
   });
   const { code, stderr } = await cmd.output();
   if (code !== 0) {
     const err = new TextDecoder().decode(stderr);
-
-    // aplay が失敗した場合、paplay (PulseAudio) を試す
-    console.warn(`aplay failed: ${err}, trying paplay...`);
-    const fallback = new Deno.Command("paplay", {
-      args: [tmpFile],
-      stdout: "null",
-      stderr: "piped",
-    });
-    const result = await fallback.output();
-    if (result.code !== 0) {
-      throw new Error(`Audio playback failed`);
-    }
+    throw new Error(`Audio playback failed: ${err}`);
   }
 }
 
 if (import.meta.main) {
-  const text = Deno.args[0] ?? "こんにちは、メイジェルです。ご用件をどうぞ。";
-  const engine = (Deno.args[1] as TTSEngine) ?? DEFAULT_ENGINE;
+  const args = Deno.args.filter((a) => a !== "--");
+  const text = args[0] ?? "こんにちは、メイジェルです。ご用件をどうぞ。";
+  const engine = (args[1] as TTSEngine) ?? DEFAULT_ENGINE;
   await speak(text, engine);
 }

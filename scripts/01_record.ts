@@ -1,85 +1,54 @@
-const SAMPLE_RATE = 16000;
-const CHANNELS = 1;
-const BIT_DEPTH = 16;
-
 interface RecordOptions {
-  /** 録音時間（秒）。0 なら無音検出で自動停止 */
+  /** 録音時間（秒） */
   duration?: number;
   /** 出力ファイルパス */
   output?: string;
 }
 
+/** WSL パスを Windows パス (\\wsl$\...) に変換 */
+async function toWinPath(wslPath: string): Promise<string> {
+  const abs = wslPath.startsWith("/")
+    ? wslPath
+    : `${Deno.cwd()}/${wslPath}`;
+  const cmd = new Deno.Command("wslpath", {
+    args: ["-w", abs],
+    stdout: "piped",
+  });
+  const { stdout } = await cmd.output();
+  return new TextDecoder().decode(stdout).trim();
+}
+
 export async function record(options: RecordOptions = {}): Promise<string> {
   const { duration = 5, output = "recording.wav" } = options;
 
-  const env: Record<string, string> = {};
-  // WSLg PulseAudio
-  const pulseServer = "/mnt/wslg/PulseServer";
-  try {
-    await Deno.stat(pulseServer);
-    env.PULSE_SERVER = `unix:${pulseServer}`;
-  } catch {
-    // PulseServer が見つからなければデフォルトで進む
-  }
+  const winOutput = await toWinPath(output);
+  const scriptDir = new URL(".", import.meta.url).pathname;
+  const winScript = await toWinPath(`${scriptDir}record.ps1`);
 
-  if (duration > 0) {
-    // 固定時間録音
-    const cmd = new Deno.Command("sox", {
-      args: [
-        "-d", // デフォルトオーディオデバイス
-        "-r",
-        String(SAMPLE_RATE),
-        "-c",
-        String(CHANNELS),
-        "-b",
-        String(BIT_DEPTH),
-        output,
-        "trim",
-        "0",
-        String(duration),
-      ],
-      env,
-      stdout: "null",
-      stderr: "piped",
-    });
-    console.log(`Recording for ${duration} seconds...`);
-    const { code, stderr } = await cmd.output();
-    if (code !== 0) {
-      const err = new TextDecoder().decode(stderr);
-      throw new Error(`Recording failed: ${err}`);
-    }
-  } else {
-    // 無音検出で自動停止
-    // silence 1 0.1 1% : 先頭の無音をスキップ
-    // 1 1.5 1%          : 1.5秒の無音で録音停止
-    const cmd = new Deno.Command("sox", {
-      args: [
-        "-d",
-        "-r",
-        String(SAMPLE_RATE),
-        "-c",
-        String(CHANNELS),
-        "-b",
-        String(BIT_DEPTH),
-        output,
-        "silence",
-        "1",
-        "0.1",
-        "1%",
-        "1",
-        "1.5",
-        "1%",
-      ],
-      env,
-      stdout: "null",
-      stderr: "piped",
-    });
-    console.log("Recording... (speak, then pause to stop)");
-    const { code, stderr } = await cmd.output();
-    if (code !== 0) {
-      const err = new TextDecoder().decode(stderr);
-      throw new Error(`Recording failed: ${err}`);
-    }
+  const cmd = new Deno.Command("powershell.exe", {
+    args: [
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      winScript,
+      "-Seconds",
+      String(duration),
+      "-OutputPath",
+      winOutput,
+    ],
+    stdout: "piped",
+    stderr: "piped",
+  });
+
+  console.log(`Recording for ${duration} seconds...`);
+  const { code, stdout, stderr } = await cmd.output();
+  const out = new TextDecoder().decode(stdout).trim();
+  if (out) console.log(out);
+
+  if (code !== 0) {
+    const err = new TextDecoder().decode(stderr);
+    throw new Error(`Recording failed: ${err}`);
   }
 
   console.log(`Saved: ${output}`);
@@ -88,6 +57,7 @@ export async function record(options: RecordOptions = {}): Promise<string> {
 
 // 直接実行時
 if (import.meta.main) {
-  const duration = parseInt(Deno.args[0] ?? "5");
+  const args = Deno.args.filter((a) => a !== "--");
+  const duration = parseInt(args[0] ?? "5");
   await record({ duration });
 }

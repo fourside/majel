@@ -1,5 +1,5 @@
 import "jsr:@std/dotenv/load";
-import Anthropic from "npm:@anthropic-ai/sdk";
+import OpenAI from "npm:openai";
 
 const SYSTEM_PROMPT = `あなたはMAJEL（メイジェル）という名前の音声アシスタントです。
 Mostly Adequate Japanese Environment Listener の略です。
@@ -10,10 +10,12 @@ Mostly Adequate Japanese Environment Listener の略です。
 - 1応答は3文以内を目安にする
 - 数値やデータは読み上げやすい形で伝える`;
 
-const conversationHistory: Anthropic.MessageParam[] = [];
+type ChatMessage = { role: "user" | "assistant"; content: string };
+
+const conversationHistory: ChatMessage[] = [];
 
 export async function chat(userMessage: string): Promise<string> {
-  const client = new Anthropic();
+  const client = new OpenAI();
 
   conversationHistory.push({ role: "user", content: userMessage });
 
@@ -23,17 +25,16 @@ export async function chat(userMessage: string): Promise<string> {
   console.log("Thinking...");
   const start = performance.now();
 
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
+  const completion = await client.chat.completions.create({
+    model: "gpt-4o-mini",
     max_tokens: 512,
-    system: SYSTEM_PROMPT,
-    messages: recentHistory,
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...recentHistory,
+    ],
   });
 
-  const assistantText = message.content
-    .filter((block): block is Anthropic.TextBlock => block.type === "text")
-    .map((block) => block.text)
-    .join("");
+  const assistantText = completion.choices[0]?.message?.content ?? "";
 
   conversationHistory.push({ role: "assistant", content: assistantText });
 
