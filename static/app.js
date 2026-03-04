@@ -12,6 +12,7 @@ const inputPanel = document.getElementById("input-panel");
 const form = document.getElementById("ask-form");
 const input = document.getElementById("message");
 const submitButton = form.querySelector("button");
+const micButton = document.getElementById("mic-button");
 
 // ── 1. 時計 ──
 function updateClock() {
@@ -86,17 +87,44 @@ const phaseLabels = {
   done: "待機中",
 };
 
+let thinkingDotsTimer = null;
+
 function setStatus(phase) {
-  statusLabel.textContent = phaseLabels[phase] ?? phase;
+  // thinking dots cleanup
+  if (thinkingDotsTimer) {
+    clearInterval(thinkingDotsTimer);
+    thinkingDotsTimer = null;
+  }
+
   statusDot.className = "status-dot";
   if (phase === "done") {
+    statusLabel.textContent = phaseLabels[phase];
     lastTranscription = "";
     return;
   }
   statusDot.classList.add("active", phase);
+
+  if (phase === "thinking") {
+    let dotCount = 0;
+    const baseText = "考え中";
+    statusLabel.textContent = baseText;
+    thinkingDotsTimer = setInterval(() => {
+      dotCount = (dotCount + 1) % 4;
+      statusLabel.textContent = baseText + ".".repeat(dotCount);
+    }, 500);
+  } else {
+    statusLabel.textContent = phaseLabels[phase] ?? phase;
+  }
 }
 
+let typewriterTimer = null;
+
 function showResponse(userText, assistantText) {
+  if (typewriterTimer) {
+    clearInterval(typewriterTimer);
+    typewriterTimer = null;
+  }
+
   responseEl.innerHTML = "";
   if (userText) {
     const u = document.createElement("div");
@@ -106,9 +134,18 @@ function showResponse(userText, assistantText) {
   }
   if (assistantText) {
     const a = document.createElement("div");
-    a.className = "response-text";
-    a.textContent = assistantText;
+    a.className = "response-text typewriter";
     responseEl.appendChild(a);
+
+    let i = 0;
+    typewriterTimer = setInterval(() => {
+      a.textContent = assistantText.slice(0, ++i);
+      if (i >= assistantText.length) {
+        clearInterval(typewriterTimer);
+        typewriterTimer = null;
+        a.classList.remove("typewriter");
+      }
+    }, 30);
   }
 }
 
@@ -155,10 +192,36 @@ function connectWs() {
 
 connectWs();
 
+/** API レスポンスを共通処理して応答を表示 */
+function displayApiResult(userText, data) {
+  if (data.error) {
+    showResponse(userText, "エラー: " + data.error);
+  } else {
+    showResponse(data.transcription ?? userText, data.response);
+  }
+}
+
 // ── 5. テキスト入力 ──
 inputToggle.addEventListener("click", () => {
   inputPanel.classList.toggle("visible");
   if (inputPanel.classList.contains("visible")) input.focus();
+});
+
+// ── 6. マイクボタン ──
+micButton.addEventListener("click", async () => {
+  if (micButton.disabled) return;
+  micButton.disabled = true;
+  micButton.classList.add("recording");
+
+  try {
+    const res = await fetch("/api/voice", { method: "POST" });
+    displayApiResult("", await res.json());
+  } catch (err) {
+    showResponse("", "エラー: " + err.message);
+  } finally {
+    micButton.disabled = false;
+    micButton.classList.remove("recording");
+  }
 });
 
 form.addEventListener("submit", async (e) => {
@@ -178,12 +241,7 @@ form.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message }),
     });
-    const data = await res.json();
-    if (data.error) {
-      showResponse(message, "エラー: " + data.error);
-    } else {
-      showResponse(message, data.response);
-    }
+    displayApiResult(message, await res.json());
   } catch (err) {
     showResponse(message, "エラー: " + err.message);
   } finally {

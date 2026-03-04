@@ -1,4 +1,5 @@
 import { Hono } from "@hono/hono";
+import { encodeBase64 } from "jsr:@std/encoding@^1/base64";
 import { getWeather } from "../services/weather.ts";
 import { getCo2Data } from "../services/co2.ts";
 import { chat, clearHistory } from "../services/llm.ts";
@@ -42,41 +43,51 @@ apiRoutes.post("/ask", async (c) => {
   }
 
   broadcast("status", { phase: "thinking" });
-  const response = await chat(message);
-  broadcast("status", { phase: "done" });
-  return c.json({ response });
+  try {
+    const response = await chat(message);
+    return c.json({ response });
+  } catch (e) {
+    console.error("ask error:", e);
+    return c.json({ error: "うまく処理できませんでした。もう一度お願いします。" }, 500);
+  } finally {
+    broadcast("status", { phase: "done" });
+  }
 });
 
 /** 音声で質問 → 音声応答の完全パイプライン */
 apiRoutes.post("/voice", async (c) => {
-  // 1. 録音
-  broadcast("status", { phase: "listening" });
-  const wavPath = await record({ duration: 5, output: "/tmp/majel_input.wav" });
+  try {
+    // 1. 録音
+    broadcast("status", { phase: "listening" });
+    const wavPath = await record({ duration: 5, output: "/tmp/majel_input.wav" });
 
-  // 2. 文字起こし
-  broadcast("status", { phase: "transcribing" });
-  const text = await transcribe(wavPath);
-  if (!text) {
+    // 2. 文字起こし
+    broadcast("status", { phase: "transcribing" });
+    const text = await transcribe(wavPath);
+    if (!text) {
+      return c.json({ error: "No speech detected", transcription: "" }, 400);
+    }
+
+    // 3. LLM 応答
+    broadcast("status", { phase: "thinking", transcription: text });
+    const response = await chat(text);
+
+    // 4. 音声合成（バイト列を返す）
+    broadcast("status", { phase: "speaking", response });
+    const audioBytes = await synthesize(response);
+    const audioBase64 = encodeBase64(audioBytes);
+
+    return c.json({
+      transcription: text,
+      response,
+      audio: audioBase64,
+    });
+  } catch (e) {
+    console.error("voice error:", e);
+    return c.json({ error: "すみません、接続に問題があるようです。" }, 500);
+  } finally {
     broadcast("status", { phase: "done" });
-    return c.json({ error: "No speech detected", transcription: "" }, 400);
   }
-
-  // 3. LLM 応答
-  broadcast("status", { phase: "thinking", transcription: text });
-  const response = await chat(text);
-
-  // 4. 音声合成（バイト列を返す）
-  broadcast("status", { phase: "speaking", response });
-  const audioBytes = await synthesize(response);
-  const { encodeBase64 } = await import("jsr:@std/encoding@^1/base64");
-  const audioBase64 = encodeBase64(audioBytes);
-
-  broadcast("status", { phase: "done" });
-  return c.json({
-    transcription: text,
-    response,
-    audio: audioBase64,
-  });
 });
 
 /** 会話履歴クリア */

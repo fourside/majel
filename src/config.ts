@@ -21,6 +21,15 @@ export const config = {
   weatherLat: 35.6895,
   weatherLon: 139.6917,
   weatherLocationName: "東京",
+
+  /** ディスプレイスケジュール */
+  displaySchedule: {
+    offTime: "00:00",
+    onTime: "06:00",
+    nightTime: "22:00",
+    nightBrightness: 30,
+    dayBrightness: 80,
+  },
 } as const;
 
 export function assertApiKey(): void {
