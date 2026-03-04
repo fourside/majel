@@ -3,7 +3,6 @@ import { logger } from "@hono/hono/logger";
 import { serveStatic } from "@hono/hono/deno";
 import { apiRoutes } from "./routes/api.ts";
 import { wsRoute } from "./routes/ws.ts";
-
 export const app = new Hono();
 
 // ミドルウェア

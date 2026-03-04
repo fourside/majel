@@ -1,5 +1,6 @@
 import type OpenAI from "openai";
 import { getWeather } from "../services/weather.ts";
+import { getCo2Data } from "../services/co2.ts";
 
 /** GPT-4o-mini function calling 用ツール定義 */
 export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
@@ -41,6 +42,18 @@ export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "get_co2",
+      description: "現在のCO2濃度を取得する。",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+  },
 ];
 
 /** ツール呼び出しを実行して結果を返す */
@@ -69,6 +82,13 @@ export async function executeTool(
         minute: "2-digit",
       });
       return JSON.stringify({ datetime: formatted });
+    }
+    case "get_co2": {
+      const co2 = getCo2Data();
+      if (co2.value === null) {
+        return JSON.stringify({ error: "CO2センサーのデータが取得できませんでした。" });
+      }
+      return JSON.stringify({ co2_ppm: co2.value, timestamp: co2.timestamp });
     }
     default:
       return JSON.stringify({ error: `Unknown tool: ${name}` });

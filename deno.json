@@ -10,6 +10,7 @@
     "transcribe": "deno run --allow-read --allow-net --allow-env scripts/02_transcribe.ts",
     "chat": "deno run --allow-net --allow-env --allow-read scripts/03_chat.ts",
     "speak": "deno run --allow-read --allow-write --allow-run --allow-net --allow-env scripts/04_speak.ts",
-    "pipeline": "deno run --allow-all scripts/05_pipeline.ts"
+    "pipeline": "deno run --allow-all scripts/05_pipeline.ts",
+    "mock:co2": "deno run --allow-write --allow-read scripts/mock_co2.ts"
   }
 }

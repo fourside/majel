@@ -1,5 +1,6 @@
 import { Hono } from "@hono/hono";
 import { getWeather } from "../services/weather.ts";
+import { getCo2Data } from "../services/co2.ts";
 import { chat, clearHistory } from "../services/llm.ts";
 import { transcribe } from "../services/stt.ts";
 import { synthesize } from "../services/tts.ts";
@@ -25,6 +26,11 @@ apiRoutes.get("/weather", async (c) => {
     name ?? undefined,
   );
   return c.json(weather);
+});
+
+/** CO2 現在値 + 履歴 */
+apiRoutes.get("/co2", (c) => {
+  return c.json(getCo2Data());
 });
 
 /** テキストで質問 → テキスト応答 */

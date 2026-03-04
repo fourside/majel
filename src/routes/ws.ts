@@ -5,6 +5,7 @@ const clients = new Set<WebSocket>();
 
 /** 全クライアントにメッセージを送信 */
 export function broadcast(type: string, data: unknown): void {
+  if (clients.size === 0) return;
   const message = JSON.stringify({ type, data, timestamp: new Date().toISOString() });
   for (const ws of clients) {
     if (ws.readyState === WebSocket.OPEN) {

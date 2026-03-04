@@ -127,7 +127,10 @@ function connectWs() {
 
   ws.onmessage = (event) => {
     const msg = JSON.parse(event.data);
-    if (msg.type === "status") {
+    if (msg.type === "co2") {
+      renderCo2(msg.data.value);
+      renderCo2Graph(msg.data.history);
+    } else if (msg.type === "status") {
       const { phase, transcription, response } = msg.data;
       setStatus(phase);
       if (transcription) {
