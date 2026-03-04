@@ -35,12 +35,27 @@ export interface WeatherData {
   precipitation: number;
 }
 
-/** Open-Meteo API から現在の天気情報を取得 */
+/** インメモリキャッシュ（10分有効） */
+const CACHE_TTL_MS = 10 * 60 * 1000;
+const weatherCache = new Map<string, { data: WeatherData; fetchedAt: number }>();
+
+/** Open-Meteo API から現在の天気情報を取得（キャッシュ付き） */
 export async function getWeather(
   lat: number = config.weatherLat,
   lon: number = config.weatherLon,
   locationName: string = config.weatherLocationName,
 ): Promise<WeatherData> {
+  const cacheKey = `${lat},${lon}`;
+  const cached = weatherCache.get(cacheKey);
+  if (cached) {
+    if (Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
+      console.log(`[weather] cache hit for ${cacheKey}`);
+      return cached.data;
+    }
+    weatherCache.delete(cacheKey);
+  }
+
+  console.log(`[weather] fetching from API for ${cacheKey}`);
   const params = new URLSearchParams({
     latitude: String(lat),
     longitude: String(lon),
@@ -66,7 +81,7 @@ export async function getWeather(
   const current = data.current;
   const code = current.weather_code as number;
 
-  return {
+  const result: WeatherData = {
     location: locationName,
     temperature: current.temperature_2m,
     apparentTemperature: current.apparent_temperature,
@@ -76,4 +91,7 @@ export async function getWeather(
     windSpeed: current.wind_speed_10m,
     precipitation: current.precipitation,
   };
+
+  weatherCache.set(cacheKey, { data: result, fetchedAt: Date.now() });
+  return result;
 }
