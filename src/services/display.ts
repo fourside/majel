@@ -88,4 +88,4 @@ export function startScheduler(): void {
 }
 
 // テスト用にexport
-export { evaluateSchedule as _evaluateSchedule };
+export { evaluateSchedule as _evaluateSchedule, timeToMinutes as _timeToMinutes, isInRange as _isInRange };

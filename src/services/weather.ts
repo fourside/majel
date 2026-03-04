@@ -24,6 +24,9 @@ const weatherLabels: Record<number, string> = {
   99: "強い雹を伴う雷雨",
 };
 
+// テスト用にexport
+export { weatherLabels as _weatherLabels };
+
 export interface WeatherData {
   location: string;
   temperature: number;
