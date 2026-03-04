@@ -8,75 +8,218 @@ body {
   font-family: "Helvetica Neue", Arial, "Hiragino Sans", sans-serif;
   background: #1a1a2e;
   color: #e0e0e0;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  padding: 2rem;
+  width: 800px;
+  height: 480px;
+  overflow: hidden;
 }
 
-.container {
+.dashboard {
   width: 100%;
-  max-width: 640px;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 100px 120px 1fr 60px;
 }
 
-h1 {
-  font-size: 2rem;
-  letter-spacing: 0.2em;
+/* ── Top bar: clock + weather ── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  border-bottom: 1px solid #16213e;
+}
+
+.clock {
+  font-size: 3.5rem;
+  font-variant-numeric: tabular-nums;
   color: #00d4ff;
+  font-weight: 300;
+  letter-spacing: 0.05em;
 }
 
-.subtitle {
-  font-size: 0.8rem;
-  color: #666;
-  margin-bottom: 1.5rem;
+.weather {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.status {
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+.weather-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.weather-temp {
+  font-size: 2rem;
+  font-weight: 300;
+  color: #e0e0e0;
+}
+
+/* ── Middle: CO2 + graph ── */
+.middle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  border-bottom: 1px solid #16213e;
+}
+
+.co2-label {
   font-size: 0.85rem;
-  margin-bottom: 1rem;
+  color: #888;
+  margin-bottom: 0.25rem;
 }
 
-.status.connected {
-  background: #0a2e1a;
-  color: #4caf50;
+.co2-value {
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: #00d4ff;
+  font-variant-numeric: tabular-nums;
 }
 
-.status.disconnected {
-  background: #2e0a0a;
+.co2-value.warning {
+  color: #fdd835;
+}
+
+.co2-value.danger {
   color: #f44336;
 }
 
-.log {
-  background: #16213e;
-  border-radius: 8px;
-  padding: 1rem;
-  min-height: 300px;
-  max-height: 60vh;
+.co2-graph {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 80px;
+}
+
+.co2-graph .bar {
+  width: 6px;
+  background: #00d4ff;
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  transition: height 0.3s ease;
+}
+
+.co2-graph .bar.dim {
+  opacity: 0.15;
+}
+
+/* ── Response area ── */
+.response {
+  padding: 1.5rem 2rem;
   overflow-y: auto;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-.log .entry {
-  margin-bottom: 0.5rem;
-  padding: 0.4rem 0;
-  border-bottom: 1px solid #1a2744;
-}
-
-.log .entry.user {
+.response-user {
+  font-size: 1.1rem;
   color: #81d4fa;
 }
 
-.log .entry.assistant {
-  color: #c5e1a5;
+.response-user::before {
+  content: "🗣 ";
 }
 
-.log .entry.system {
-  color: #666;
-  font-size: 0.8rem;
+.response-text {
+  font-size: 1.3rem;
+  color: #c5e1a5;
+  line-height: 1.6;
+}
+
+/* ── Status bar ── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 2rem;
+  background: #16213e;
+  font-size: 1rem;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4caf50;
+  flex-shrink: 0;
+}
+
+.status-dot.active {
+  animation: breathe 2s ease-in-out infinite;
+}
+
+.status-dot.disconnected {
+  background: #f44336;
+}
+
+.status-dot.listening {
+  background: #00d4ff;
+}
+
+.status-dot.thinking {
+  background: #fdd835;
+}
+
+.status-dot.speaking {
+  background: #c5e1a5;
+}
+
+.status-label {
+  color: #aaa;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+
+/* ── Input toggle + panel ── */
+.input-toggle {
+  position: fixed;
+  bottom: 70px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #333;
+  background: #16213e;
+  color: #00d4ff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.input-toggle:hover {
+  opacity: 1;
+}
+
+.input-panel {
+  position: fixed;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  background: #0e1628;
+  border-top: 1px solid #333;
+  padding: 0.75rem 1rem;
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+  z-index: 5;
+}
+
+.input-panel.visible {
+  transform: translateY(0);
 }
 
 .input-area {
@@ -86,12 +229,12 @@ h1 {
 
 .input-area input {
   flex: 1;
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 0.75rem;
   border: 1px solid #333;
   border-radius: 4px;
   background: #16213e;
   color: #e0e0e0;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .input-area input:focus {
@@ -100,14 +243,14 @@ h1 {
 }
 
 .input-area button {
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 4px;
   background: #00d4ff;
   color: #1a1a2e;
   font-weight: bold;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .input-area button:hover {

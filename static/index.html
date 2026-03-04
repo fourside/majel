@@ -2,20 +2,44 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=800, height=480">
   <title>MAJEL</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>MAJEL</h1>
-    <p class="subtitle">Mostly Adequate Japanese Environment Listener</p>
+  <div class="dashboard">
+    <!-- 時刻 + 天気 -->
+    <div class="top-bar">
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="weather">
+        <span class="weather-icon" id="weather-icon">--</span>
+        <span class="weather-temp" id="weather-temp">--°C</span>
+      </div>
+    </div>
 
-    <div id="status" class="status disconnected">切断中</div>
+    <!-- CO2 + ミニグラフ -->
+    <div class="middle">
+      <div>
+        <div class="co2-label">CO₂</div>
+        <div class="co2-value" id="co2-value">-- ppm</div>
+      </div>
+      <div class="co2-graph" id="co2-graph"></div>
+    </div>
 
-    <div id="log" class="log"></div>
+    <!-- 直近の応答 -->
+    <div class="response" id="response"></div>
 
-    <form id="ask-form" class="input-area">
+    <!-- ステータスバー -->
+    <div class="status-bar">
+      <div class="status-dot" id="status-dot"></div>
+      <span class="status-label" id="status-label">起動中...</span>
+    </div>
+  </div>
+
+  <!-- テキスト入力（トグル式） -->
+  <button class="input-toggle" id="input-toggle" title="テキスト入力">⌨</button>
+  <div class="input-panel" id="input-panel">
+    <form class="input-area" id="ask-form">
       <input type="text" id="message" placeholder="メッセージを入力..." autocomplete="off">
       <button type="submit">送信</button>
     </form>
