@@ -2,8 +2,11 @@
 const clockEl = document.getElementById("clock");
 const weatherIconEl = document.getElementById("weather-icon");
 const weatherTempEl = document.getElementById("weather-temp");
-const co2ValueEl = document.getElementById("co2-value");
-const co2GraphEl = document.getElementById("co2-graph");
+const sensorTempEl = document.getElementById("sensor-temp");
+const sensorHumidityEl = document.getElementById("sensor-humidity");
+const sensorPressureEl = document.getElementById("sensor-pressure");
+const sensorLightEl = document.getElementById("sensor-light");
+const lightGraphEl = document.getElementById("light-graph");
 const responseEl = document.getElementById("response");
 const statusDot = document.getElementById("status-dot");
 const statusLabel = document.getElementById("status-label");
@@ -51,32 +54,36 @@ async function fetchWeather() {
 fetchWeather();
 setInterval(fetchWeather, 10 * 60 * 1000);
 
-// ── 3. CO2 プレースホルダー ──
-function renderCo2(value) {
-  if (value == null) {
-    co2ValueEl.textContent = "-- ppm";
-    co2ValueEl.className = "co2-value";
-  } else {
-    co2ValueEl.textContent = value + " ppm";
-    co2ValueEl.className = "co2-value" +
-      (value >= 1500 ? " danger" : value >= 1000 ? " warning" : "");
+// ── 3. 環境センサー ──
+function renderSensors(data) {
+  if (!data || data.temperature === null) {
+    sensorTempEl.textContent = "--°C";
+    sensorHumidityEl.textContent = "--%";
+    sensorPressureEl.textContent = "--hPa";
+    sensorLightEl.textContent = "--lx";
+    return;
   }
+  sensorTempEl.textContent = data.temperature.toFixed(1) + "°C";
+  sensorHumidityEl.textContent = Math.round(data.humidity) + "%";
+  sensorPressureEl.textContent = Math.round(data.pressure) + "hPa";
+  sensorLightEl.textContent = Math.round(data.light) + "lx";
 }
 
-function renderCo2Graph(values) {
-  co2GraphEl.innerHTML = "";
-  const max = values ? Math.max(...values, 1) : 1;
-  const bars = values ?? Array(24).fill(0);
+function renderLightGraph(values) {
+  lightGraphEl.innerHTML = "";
+  const hasData = values && values.length > 0;
+  const max = hasData ? Math.max(...values, 1) : 1;
+  const bars = hasData ? values : Array(24).fill(0);
   bars.forEach((v) => {
     const bar = document.createElement("div");
-    bar.className = "bar" + (values ? "" : " dim");
-    bar.style.height = (values ? (v / max) * 72 + 8 : 10) + "px";
-    co2GraphEl.appendChild(bar);
+    bar.className = "bar" + (hasData ? "" : " dim");
+    bar.style.height = (hasData ? (v / max) * 32 + 8 : 6) + "px";
+    lightGraphEl.appendChild(bar);
   });
 }
 
-renderCo2(null);
-renderCo2Graph(null);
+renderSensors(null);
+renderLightGraph(null);
 
 // ── 4. WebSocket ──
 const phaseLabels = {
@@ -164,9 +171,9 @@ function connectWs() {
 
   ws.onmessage = (event) => {
     const msg = JSON.parse(event.data);
-    if (msg.type === "co2") {
-      renderCo2(msg.data.value);
-      renderCo2Graph(msg.data.history);
+    if (msg.type === "sensors") {
+      renderSensors(msg.data);
+      renderLightGraph(msg.data.lightHistory);
     } else if (msg.type === "status") {
       const { phase, transcription, response } = msg.data;
       setStatus(phase);

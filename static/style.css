@@ -54,52 +54,57 @@ body {
   color: #e0e0e0;
 }
 
-/* ── Middle: CO2 + graph ── */
+/* ── Middle: environment sensors ── */
 .middle {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
   padding: 0 2rem;
   border-bottom: 1px solid #16213e;
 }
 
-.co2-label {
-  font-size: 0.85rem;
-  color: #888;
-  margin-bottom: 0.25rem;
+.sensor-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
-.co2-value {
-  font-size: 2.5rem;
+.sensor-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sensor-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.sensor-value {
+  font-size: 1.8rem;
   font-weight: 300;
   color: #00d4ff;
   font-variant-numeric: tabular-nums;
 }
 
-.co2-value.warning {
-  color: #fdd835;
-}
-
-.co2-value.danger {
-  color: #f44336;
-}
-
-.co2-graph {
+.light-graph {
   display: flex;
   align-items: flex-end;
-  gap: 3px;
-  height: 80px;
+  gap: 2px;
+  height: 40px;
+  margin-left: auto;
 }
 
-.co2-graph .bar {
-  width: 6px;
-  background: #00d4ff;
+.light-graph .bar {
+  width: 4px;
+  background: #fdd835;
   border-radius: 2px 2px 0 0;
   min-height: 2px;
   transition: height 0.3s ease;
 }
 
-.co2-graph .bar.dim {
+.light-graph .bar.dim {
   opacity: 0.15;
 }
 

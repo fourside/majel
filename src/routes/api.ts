@@ -1,7 +1,7 @@
 import { Hono } from "@hono/hono";
 import { encodeBase64 } from "jsr:@std/encoding@^1/base64";
 import { getWeather } from "../services/weather.ts";
-import { getCo2Data } from "../services/co2.ts";
+import { getSensorData } from "../services/sensors.ts";
 import { chat, clearHistory } from "../services/llm.ts";
 import { transcribe } from "../services/stt.ts";
 import { synthesize } from "../services/tts.ts";
@@ -29,9 +29,9 @@ apiRoutes.get("/weather", async (c) => {
   return c.json(weather);
 });
 
-/** CO2 現在値 + 履歴 */
-apiRoutes.get("/co2", (c) => {
-  return c.json(getCo2Data());
+/** センサー現在値 + 照度履歴 */
+apiRoutes.get("/sensors", (c) => {
+  return c.json(getSensorData());
 });
 
 /** テキストで質問 → テキスト応答 */

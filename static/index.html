@@ -17,13 +17,29 @@
       </div>
     </div>
 
-    <!-- CO2 + ミニグラフ -->
+    <!-- 環境センサー -->
     <div class="middle">
-      <div>
-        <div class="co2-label">CO₂</div>
-        <div class="co2-value" id="co2-value">-- ppm</div>
+      <div class="sensor-row">
+        <div class="sensor-item">
+          <span class="sensor-icon">🌡</span>
+          <span class="sensor-value" id="sensor-temp">--°C</span>
+        </div>
+        <div class="sensor-item">
+          <span class="sensor-icon">💧</span>
+          <span class="sensor-value" id="sensor-humidity">--%</span>
+        </div>
+        <div class="sensor-item">
+          <span class="sensor-icon">📊</span>
+          <span class="sensor-value" id="sensor-pressure">--hPa</span>
+        </div>
       </div>
-      <div class="co2-graph" id="co2-graph"></div>
+      <div class="sensor-row">
+        <div class="sensor-item">
+          <span class="sensor-icon">💡</span>
+          <span class="sensor-value" id="sensor-light">--lx</span>
+        </div>
+        <div class="light-graph" id="light-graph"></div>
+      </div>
     </div>
 
     <!-- 直近の応答 -->

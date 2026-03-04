@@ -1,10 +1,10 @@
 import { config, assertApiKey } from "./config.ts";
 import { app } from "./server.ts";
-import { startCo2Service } from "./services/co2.ts";
+import { startSensorService } from "./services/sensors.ts";
 import { startScheduler } from "./services/display.ts";
 
 assertApiKey();
-startCo2Service();
+startSensorService();
 startScheduler();
 
 console.log(`MAJEL server starting on port ${config.port}...`);

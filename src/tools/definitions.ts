@@ -1,6 +1,6 @@
 import type OpenAI from "openai";
 import { getWeather } from "../services/weather.ts";
-import { getCo2Data } from "../services/co2.ts";
+import { getSensorData } from "../services/sensors.ts";
 
 /** GPT-4o-mini function calling 用ツール定義 */
 export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
@@ -45,8 +45,8 @@ export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
   {
     type: "function",
     function: {
-      name: "get_co2",
-      description: "現在のCO2濃度を取得する。",
+      name: "get_environment",
+      description: "現在の室内環境データ（温度・湿度・気圧・照度）を取得する。",
       parameters: {
         type: "object",
         properties: {},
@@ -83,12 +83,20 @@ export async function executeTool(
       });
       return JSON.stringify({ datetime: formatted });
     }
-    case "get_co2": {
-      const co2 = getCo2Data();
-      if (co2.value === null) {
-        return JSON.stringify({ error: "CO2センサーのデータが取得できませんでした。" });
+    case "get_environment": {
+      const env = getSensorData();
+      if (env.temperature === null) {
+        return JSON.stringify({ error: "環境センサーのデータが取得できませんでした。" });
       }
-      return JSON.stringify({ co2_ppm: co2.value, timestamp: co2.timestamp });
+      const result: Record<string, unknown> = {
+        temperature: env.temperature,
+        humidity: env.humidity,
+        pressure: env.pressure,
+        light: env.light,
+        timestamp: env.timestamp,
+      };
+      if (env.co2 !== null) result.co2_ppm = env.co2;
+      return JSON.stringify(result);
     }
     default:
       return JSON.stringify({ error: `Unknown tool: ${name}` });
