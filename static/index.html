@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAJEL</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>MAJEL</h1>
+    <p class="subtitle">Mostly Adequate Japanese Environment Listener</p>
+
+    <div id="status" class="status disconnected">切断中</div>
+
+    <div id="log" class="log"></div>
+
+    <form id="ask-form" class="input-area">
+      <input type="text" id="message" placeholder="メッセージを入力..." autocomplete="off">
+      <button type="submit">送信</button>
+    </form>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

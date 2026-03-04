@@ -1,5 +1,11 @@
 {
+  "imports": {
+    "@hono/hono": "jsr:@hono/hono@4",
+    "@std/dotenv": "jsr:@std/dotenv@0.225",
+    "openai": "npm:openai@^4"
+  },
   "tasks": {
+    "start": "deno run --allow-all src/main.ts",
     "record": "deno run --allow-run --allow-write --allow-read scripts/01_record.ts",
     "transcribe": "deno run --allow-read --allow-net --allow-env scripts/02_transcribe.ts",
     "chat": "deno run --allow-net --allow-env --allow-read scripts/03_chat.ts",
