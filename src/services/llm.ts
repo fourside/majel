@@ -14,19 +14,27 @@ Mostly Adequate Japanese Environment Listener の略です。
 
 type ChatMessage = OpenAI.Chat.Completions.ChatCompletionMessageParam;
 
-const client = new OpenAI();
+let client: OpenAI | null = null;
+function getClient(): OpenAI {
+  if (!client) client = new OpenAI();
+  return client;
+}
+
 const conversationHistory: ChatMessage[] = [];
 const MAX_HISTORY = 20;
 const MAX_TOOL_ROUNDS = 5;
 
+/** 履歴が max を超えたら古い分を削除（in-place） */
+function trimHistory<T>(history: T[], max: number): void {
+  if (history.length > max) {
+    history.splice(0, history.length - max);
+  }
+}
+
 /** function calling 対応のチャット。ツール呼び出しがあれば自動で処理する。 */
 export async function chat(userMessage: string): Promise<string> {
   conversationHistory.push({ role: "user", content: userMessage });
-
-  // 古い履歴を破棄して直近のみ保持
-  if (conversationHistory.length > MAX_HISTORY) {
-    conversationHistory.splice(0, conversationHistory.length - MAX_HISTORY);
-  }
+  trimHistory(conversationHistory, MAX_HISTORY);
 
   const messages: ChatMessage[] = [
     { role: "system", content: SYSTEM_PROMPT },
@@ -37,7 +45,7 @@ export async function chat(userMessage: string): Promise<string> {
   const start = performance.now();
 
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-    const completion = await client.chat.completions.create({
+    const completion = await getClient().chat.completions.create({
       model: config.llmModel,
       max_tokens: 512,
       messages,
@@ -83,3 +91,6 @@ export async function chat(userMessage: string): Promise<string> {
 export function clearHistory(): void {
   conversationHistory.length = 0;
 }
+
+// テスト用にexport
+export { conversationHistory as _conversationHistory, trimHistory as _trimHistory };

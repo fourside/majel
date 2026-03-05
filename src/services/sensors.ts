@@ -27,15 +27,27 @@ const lightHistory: number[] = [];
 let current: SensorReading | null = null;
 let timerId: number | undefined;
 
+/** JSON パース結果を SensorReading として検証する */
+function validateReading(data: Record<string, unknown>): SensorReading | null {
+  const required = [data.temperature, data.humidity, data.pressure, data.light];
+  if (!required.every((v) => typeof v === "number") || !data.timestamp) {
+    return null;
+  }
+  return data as unknown as SensorReading;
+}
+
+/** 照度履歴に値を追加し、maxSize を超えたら古い値を削除する */
+function addToLightHistory(history: number[], value: number, maxSize: number): void {
+  history.push(value);
+  if (history.length > maxSize) {
+    history.shift();
+  }
+}
+
 async function readSensorFile(): Promise<SensorReading | null> {
   try {
     const text = await Deno.readTextFile(SENSORS_FILE);
-    const data = JSON.parse(text) as SensorReading;
-    const required = [data.temperature, data.humidity, data.pressure, data.light];
-    if (!required.every((v) => typeof v === "number") || !data.timestamp) {
-      return null;
-    }
-    return data;
+    return validateReading(JSON.parse(text));
   } catch {
     return null;
   }
@@ -45,10 +57,7 @@ async function poll(): Promise<void> {
   const reading = await readSensorFile();
   if (reading) {
     current = reading;
-    lightHistory.push(reading.light);
-    if (lightHistory.length > HISTORY_SIZE) {
-      lightHistory.shift();
-    }
+    addToLightHistory(lightHistory, reading.light, HISTORY_SIZE);
     broadcast("sensors", getSensorData());
   }
 }
@@ -73,3 +82,6 @@ export function startSensorService(): void {
   poll(); // 初回即時実行
   timerId = setInterval(poll, POLL_INTERVAL);
 }
+
+// テスト用にexport
+export { validateReading as _validateReading, addToLightHistory as _addToLightHistory };

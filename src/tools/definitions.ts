@@ -1,6 +1,7 @@
 import type OpenAI from "openai";
 import { getWeather } from "../services/weather.ts";
 import { getSensorData } from "../services/sensors.ts";
+import { setBrightness, setPower } from "../services/display.ts";
 
 /** GPT-4o-mini function calling 用ツール定義 */
 export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
@@ -54,6 +55,40 @@ export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "set_display_brightness",
+      description: "ディスプレイの明るさを設定する。0〜100のパーセント値で指定する。",
+      parameters: {
+        type: "object",
+        properties: {
+          value: {
+            type: "number",
+            description: "明るさ（0〜100%）",
+          },
+        },
+        required: ["value"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "set_display_power",
+      description: "ディスプレイの電源をオンまたはオフにする。",
+      parameters: {
+        type: "object",
+        properties: {
+          on: {
+            type: "boolean",
+            description: "trueでオン、falseでオフ",
+          },
+        },
+        required: ["on"],
+      },
+    },
+  },
 ];
 
 /** ツール呼び出しを実行して結果を返す */
@@ -97,6 +132,16 @@ export async function executeTool(
       };
       if (env.co2 !== null) result.co2_ppm = env.co2;
       return JSON.stringify(result);
+    }
+    case "set_display_brightness": {
+      const value = args.value as number;
+      await setBrightness(value);
+      return JSON.stringify({ ok: true, brightness: value });
+    }
+    case "set_display_power": {
+      const on = args.on as boolean;
+      await setPower(on);
+      return JSON.stringify({ ok: true, power: on });
     }
     default:
       return JSON.stringify({ error: `Unknown tool: ${name}` });

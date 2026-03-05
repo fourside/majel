@@ -132,6 +132,31 @@ body {
   line-height: 1.6;
 }
 
+.response-error {
+  font-size: 1.1rem;
+  color: #ef9a9a;
+  background: rgba(244, 67, 54, 0.1);
+  border-left: 3px solid #f44336;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 4px 4px 0;
+}
+
+.retry-button {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid #ef9a9a;
+  border-radius: 4px;
+  background: transparent;
+  color: #ef9a9a;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.retry-button:hover {
+  background: rgba(244, 67, 54, 0.15);
+}
+
 /* ── Status bar ── */
 .status-bar {
   display: flex;
@@ -267,7 +292,7 @@ body {
   color: #00d4ff;
   font-size: 1.1rem;
   cursor: pointer;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   z-index: 10;

@@ -126,12 +126,11 @@ function setStatus(phase) {
 
 let typewriterTimer = null;
 
-function showResponse(userText, assistantText) {
+function clearResponse(userText) {
   if (typewriterTimer) {
     clearInterval(typewriterTimer);
     typewriterTimer = null;
   }
-
   responseEl.innerHTML = "";
   if (userText) {
     const u = document.createElement("div");
@@ -139,6 +138,10 @@ function showResponse(userText, assistantText) {
     u.textContent = userText;
     responseEl.appendChild(u);
   }
+}
+
+function showResponse(userText, assistantText) {
+  clearResponse(userText);
   if (assistantText) {
     const a = document.createElement("div");
     a.className = "response-text typewriter";
@@ -199,46 +202,69 @@ function connectWs() {
 
 connectWs();
 
+/** エラーメッセージをスタイル付きで表示（リトライボタン付き） */
+function showError(userText, errorMessage, retryFn) {
+  clearResponse(userText);
+
+  const e = document.createElement("div");
+  e.className = "response-error";
+  e.textContent = errorMessage;
+  responseEl.appendChild(e);
+
+  if (retryFn) {
+    const btn = document.createElement("button");
+    btn.className = "retry-button";
+    btn.textContent = "もう一度試す";
+    btn.addEventListener("click", retryFn);
+    responseEl.appendChild(btn);
+  }
+}
+
 /** API レスポンスを共通処理して応答を表示 */
-function displayApiResult(userText, data) {
+function displayApiResult(userText, data, retryFn) {
   if (data.error) {
-    showResponse(userText, "エラー: " + data.error);
+    showError(userText, data.error, retryFn);
   } else {
     showResponse(data.transcription ?? userText, data.response);
   }
 }
 
-// ── 5. テキスト入力 ──
+// ── 5. テキスト入力（?dev 時のみ表示） ──
+const devMode = new URLSearchParams(location.search).has("dev");
+
+if (devMode) {
+  inputToggle.style.display = "flex";
+  inputPanel.classList.add("visible");
+} else {
+  inputToggle.style.display = "none";
+}
+
 inputToggle.addEventListener("click", () => {
   inputPanel.classList.toggle("visible");
   if (inputPanel.classList.contains("visible")) input.focus();
 });
 
 // ── 6. マイクボタン ──
-micButton.addEventListener("click", async () => {
+async function doVoice() {
   if (micButton.disabled) return;
   micButton.disabled = true;
   micButton.classList.add("recording");
 
   try {
     const res = await fetch("/api/voice", { method: "POST" });
-    displayApiResult("", await res.json());
-  } catch (err) {
-    showResponse("", "エラー: " + err.message);
+    displayApiResult("", await res.json(), doVoice);
+  } catch {
+    showError("", "接続に問題があるようです", doVoice);
   } finally {
     micButton.disabled = false;
     micButton.classList.remove("recording");
   }
-});
+}
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const message = input.value.trim();
-  if (!message) return;
+micButton.addEventListener("click", doVoice);
 
-  input.value = "";
+async function doAsk(message) {
   submitButton.disabled = true;
-
   showResponse(message, null);
   setStatus("thinking");
 
@@ -248,11 +274,19 @@ form.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message }),
     });
-    displayApiResult(message, await res.json());
-  } catch (err) {
-    showResponse(message, "エラー: " + err.message);
+    displayApiResult(message, await res.json(), () => doAsk(message));
+  } catch {
+    showError(message, "接続に問題があるようです", () => doAsk(message));
   } finally {
     setStatus("done");
     submitButton.disabled = false;
   }
+}
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const message = input.value.trim();
+  if (!message) return;
+  input.value = "";
+  doAsk(message);
 });

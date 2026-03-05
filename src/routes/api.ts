@@ -6,6 +6,7 @@ import { chat, clearHistory } from "../services/llm.ts";
 import { transcribe } from "../services/stt.ts";
 import { synthesize } from "../services/tts.ts";
 import { record } from "../services/audio.ts";
+import { setBrightness, setPower, getBrightness } from "../services/display.ts";
 import { broadcast } from "./ws.ts";
 
 export const apiRoutes = new Hono();
@@ -88,6 +89,34 @@ apiRoutes.post("/voice", async (c) => {
   } finally {
     broadcast("status", { phase: "done" });
   }
+});
+
+/** ディスプレイ明るさ設定 */
+apiRoutes.post("/display/brightness", async (c) => {
+  const body = await c.req.json();
+  const value = body.value;
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 100) {
+    return c.json({ error: "value must be a number between 0-100" }, 400);
+  }
+  await setBrightness(value);
+  return c.json({ ok: true, brightness: value });
+});
+
+/** ディスプレイ電源制御 */
+apiRoutes.post("/display/power", async (c) => {
+  const body = await c.req.json();
+  const on = body.on as boolean;
+  if (typeof on !== "boolean") {
+    return c.json({ error: "on must be a boolean" }, 400);
+  }
+  await setPower(on);
+  return c.json({ ok: true, power: on });
+});
+
+/** ディスプレイ状態取得 */
+apiRoutes.get("/display/status", async (c) => {
+  const brightness = await getBrightness();
+  return c.json({ brightness });
 });
 
 /** 会話履歴クリア */
