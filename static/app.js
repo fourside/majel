@@ -233,7 +233,7 @@ function displayApiResult(userText, data, retryFn) {
 const devMode = new URLSearchParams(location.search).has("dev");
 
 if (devMode) {
-  inputToggle.style.display = "flex";
+  inputToggle.style.display = "grid";
   inputPanel.classList.add("visible");
 } else {
   inputToggle.style.display = "none";
