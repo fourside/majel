@@ -29,6 +29,13 @@
   box-sizing: border-box;
 }
 
+majel-clock,
+majel-weather,
+majel-sensors,
+majel-status {
+  display: contents;
+}
+
 body {
   font-family: "Helvetica Neue", Arial, "Hiragino Sans", sans-serif;
   background: var(--color-bg);

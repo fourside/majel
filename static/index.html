@@ -10,45 +10,23 @@
   <div class="dashboard">
     <!-- 時刻 + 天気 -->
     <div class="top-bar">
-      <div class="clock" id="clock">--:--:--</div>
+      <majel-clock></majel-clock>
       <div class="weather">
-        <span class="weather-icon" id="weather-icon">--</span>
-        <span class="weather-temp" id="weather-temp">--°C</span>
+        <majel-weather></majel-weather>
       </div>
     </div>
 
     <!-- 環境センサー -->
     <div class="middle">
-      <div class="sensor-row">
-        <div class="sensor-item">
-          <span class="sensor-icon">🌡</span>
-          <span class="sensor-value" id="sensor-temp">--°C</span>
-        </div>
-        <div class="sensor-item">
-          <span class="sensor-icon">💧</span>
-          <span class="sensor-value" id="sensor-humidity">--%</span>
-        </div>
-        <div class="sensor-item">
-          <span class="sensor-icon">📊</span>
-          <span class="sensor-value" id="sensor-pressure">--hPa</span>
-        </div>
-      </div>
-      <div class="sensor-row">
-        <div class="sensor-item">
-          <span class="sensor-icon">💡</span>
-          <span class="sensor-value" id="sensor-light">--lx</span>
-        </div>
-        <div class="light-graph" id="light-graph"></div>
-      </div>
+      <majel-sensors></majel-sensors>
     </div>
 
     <!-- 直近の応答 -->
-    <div class="response" id="response"></div>
+    <majel-response class="response"></majel-response>
 
     <!-- ステータスバー -->
     <div class="status-bar">
-      <div class="status-dot" id="status-dot"></div>
-      <span class="status-label" id="status-label">起動中...</span>
+      <majel-status></majel-status>
       <button class="mic-button" id="mic-button" title="音声入力">
         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
           <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
@@ -67,6 +45,6 @@
     </form>
   </div>
 
-  <script src="/app.js"></script>
+  <script type="module" src="/app.js"></script>
 </body>
 </html>

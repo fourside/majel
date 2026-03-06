@@ -12,6 +12,6 @@
     "speak": "deno run --allow-read --allow-write --allow-run --allow-net --allow-env scripts/04_speak.ts",
     "pipeline": "deno run --allow-all scripts/05_pipeline.ts",
     "mock:sensors": "deno run --allow-write --allow-read scripts/mock_sensors.ts",
-    "test": "deno test --allow-read --allow-env src/"
+    "test": "deno test --allow-read --allow-env src/ static/lib/"
   }
 }
