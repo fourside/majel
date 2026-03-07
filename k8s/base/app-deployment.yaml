@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: majel
+  namespace: majel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: majel
+  template:
+    metadata:
+      labels:
+        app: majel
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/fourside/majel-app:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: majel-secrets
+                  key: openai-api-key
+          envFrom:
+            - configMapRef:
+                name: majel-config
+          volumeMounts:
+            - name: shared
+              mountPath: /tmp/majel
+            - name: snd
+              mountPath: /dev/snd
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+
+        - name: sensors
+          image: ghcr.io/fourside/majel-sensors:latest
+          volumeMounts:
+            - name: shared
+              mountPath: /tmp/majel
+            - name: i2c
+              mountPath: /dev/i2c-1
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+              add: ["SYS_RAWIO"]
+
+      volumes:
+        - name: shared
+          emptyDir: {}
+        - name: snd
+          hostPath:
+            path: /dev/snd
+            type: Directory
+        - name: i2c
+          hostPath:
+            path: /dev/i2c-1
+            type: CharDevice

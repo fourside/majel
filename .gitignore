@@ -1,3 +1,4 @@
 .env
 *.wav
 PLAN*.md
+k8s/base/secret.yaml
