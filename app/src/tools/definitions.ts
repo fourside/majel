@@ -2,6 +2,7 @@ import type OpenAI from "openai";
 import { getWeather } from "../services/weather.ts";
 import { getSensorData } from "../services/sensors.ts";
 import { setBrightness, setPower } from "../services/display.ts";
+import { suppressAutoBrightness } from "../services/auto-brightness.ts";
 
 /** GPT-4o-mini function calling 用ツール定義 */
 export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
@@ -135,6 +136,7 @@ export async function executeTool(
     }
     case "set_display_brightness": {
       const value = args.value as number;
+      suppressAutoBrightness();
       await setBrightness(value);
       return JSON.stringify({ ok: true, brightness: value });
     }

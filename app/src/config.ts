@@ -22,13 +22,10 @@ export const config = {
   weatherLon: 139.6917,
   weatherLocationName: "東京",
 
-  /** ディスプレイスケジュール */
+  /** ディスプレイスケジュール（輝度は auto-brightness が制御） */
   displaySchedule: {
-    offTime: "00:00",
+    offTime: "01:00",
     onTime: "06:00",
-    nightTime: "22:00",
-    nightBrightness: 30,
-    dayBrightness: 80,
   },
 } as const;
 
