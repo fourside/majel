@@ -32,6 +32,8 @@ spec:
               mountPath: /tmp/majel
             - name: snd
               mountPath: /dev/snd
+            - name: backlight
+              mountPath: /sys/class/backlight
           resources:
             requests:
               memory: "64Mi"
@@ -78,3 +80,7 @@ spec:
           hostPath:
             path: /dev/i2c-1
             type: CharDevice
+        - name: backlight
+          hostPath:
+            path: /sys/class/backlight
+            type: Directory
