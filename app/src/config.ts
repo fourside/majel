@@ -17,10 +17,10 @@ export const config = {
   /** STT 言語 */
   sttLanguage: "ja",
 
-  /** 天気 API デフォルト位置（東京） */
-  weatherLat: 35.6895,
-  weatherLon: 139.6917,
-  weatherLocationName: "東京",
+  /** 天気 API デフォルト位置（川崎） */
+  weatherLat: 35.5308,
+  weatherLon: 139.7030,
+  weatherLocationName: "川崎",
 
   /** ディスプレイスケジュール（輝度は auto-brightness が制御） */
   displaySchedule: {
