@@ -64,10 +64,7 @@ spec:
               memory: "128Mi"
               cpu: "200m"
           securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["ALL"]
-              add: ["SYS_RAWIO"]
+            privileged: true
 
       volumes:
         - name: shared
