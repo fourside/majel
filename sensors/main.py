@@ -28,15 +28,12 @@ def create_bus():
 # ── HTU21D (温度・湿度) ──
 def read_htu21d(bus):
     try:
-        bus.write_byte(HTU21D_ADDR, 0xF3)
-        time.sleep(0.1)
-        data = bus.read_i2c_block_data(HTU21D_ADDR, 0x00, 3)
+        # Hold Master mode: sensor holds SCL until measurement complete
+        data = bus.read_i2c_block_data(HTU21D_ADDR, 0xE3, 3)
         raw_temp = (data[0] << 8) + data[1]
         temp = -46.85 + 175.72 * (raw_temp / 65536.0)
 
-        bus.write_byte(HTU21D_ADDR, 0xF5)
-        time.sleep(0.1)
-        data = bus.read_i2c_block_data(HTU21D_ADDR, 0x00, 3)
+        data = bus.read_i2c_block_data(HTU21D_ADDR, 0xE5, 3)
         raw_hum = (data[0] << 8) + data[1]
         hum = -6.0 + 125.0 * (raw_hum / 65536.0)
         hum = max(0.0, min(100.0, hum))
