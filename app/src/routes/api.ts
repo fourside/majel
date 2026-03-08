@@ -7,6 +7,7 @@ import { transcribe } from "../services/stt.ts";
 import { synthesize } from "../services/tts.ts";
 import { record } from "../services/audio.ts";
 import { setBrightness, setPower, getBrightness } from "../services/display.ts";
+import { suppressAutoBrightness } from "../services/auto-brightness.ts";
 import { broadcast } from "./ws.ts";
 
 export const apiRoutes = new Hono();
@@ -98,6 +99,7 @@ apiRoutes.post("/display/brightness", async (c) => {
   if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 100) {
     return c.json({ error: "value must be a number between 0-100" }, 400);
   }
+  suppressAutoBrightness();
   await setBrightness(value);
   return c.json({ ok: true, brightness: value });
 });
