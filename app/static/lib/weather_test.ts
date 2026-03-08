@@ -1,18 +1,18 @@
 import { assertEquals } from "jsr:@std/assert";
-import { wmoIcons, wmoCodeToIcon, formatTemperature } from "./weather.js";
+import { wmoCodeToIcon, formatTemperature } from "./weather.js";
 
 // ── wmoCodeToIcon ──
 
-Deno.test("wmoCodeToIcon > known code returns icon", () => {
-  assertEquals(wmoCodeToIcon(0), wmoIcons[0]);
+Deno.test("wmoCodeToIcon > known code returns image path", () => {
+  assertEquals(wmoCodeToIcon(0), "/images/weather/sunny.gif");
 });
 
 Deno.test("wmoCodeToIcon > thunderstorm code", () => {
-  assertEquals(wmoCodeToIcon(95), wmoIcons[95]);
+  assertEquals(wmoCodeToIcon(95), "/images/weather/thunder.gif");
 });
 
-Deno.test("wmoCodeToIcon > unknown code returns thermometer", () => {
-  assertEquals(wmoCodeToIcon(999), "🌡");
+Deno.test("wmoCodeToIcon > unknown code returns unknown", () => {
+  assertEquals(wmoCodeToIcon(999), "/images/weather/cloudy.gif");
 });
 
 // ── formatTemperature ──

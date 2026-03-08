@@ -1,19 +1,5 @@
 import { assertEquals } from "jsr:@std/assert";
-import { formatTime, formatSensorValue } from "./format.js";
-
-// ── formatTime ──
-
-Deno.test("formatTime > zero-pads single digits", () => {
-  assertEquals(formatTime(1, 2, 3), "01:02:03");
-});
-
-Deno.test("formatTime > double digits unchanged", () => {
-  assertEquals(formatTime(23, 59, 59), "23:59:59");
-});
-
-Deno.test("formatTime > midnight", () => {
-  assertEquals(formatTime(0, 0, 0), "00:00:00");
-});
+import { formatSensorValue } from "./format.js";
 
 // ── formatSensorValue ──
 

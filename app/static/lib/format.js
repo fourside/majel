@@ -1,12 +1,3 @@
-/** @param {number} h @param {number} m @param {number} s */
-export function formatTime(h, m, s) {
-  return (
-    String(h).padStart(2, "0") + ":" +
-    String(m).padStart(2, "0") + ":" +
-    String(s).padStart(2, "0")
-  );
-}
-
 /**
  * @param {number|null|undefined} value
  * @param {string} unit
