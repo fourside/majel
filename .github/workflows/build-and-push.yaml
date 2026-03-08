@@ -84,4 +84,4 @@ jobs:
             --body "Automated image tag update from CI build." \
             --head "$BRANCH" \
             --base main
-          gh pr merge "$BRANCH" --squash --auto
+          gh pr merge "$BRANCH" --squash --delete-branch
