@@ -28,10 +28,10 @@
   --color-user: #81d4fa;
   --color-assistant: #c5e1a5;
 
-  --font-display: 3.5rem;
-  --font-data: 1.8rem;
-  --font-body: 1.1rem;
-  --font-small: 0.9rem;
+  --font-display: 2.2rem;
+  --font-data: 0.9rem;
+  --font-body: 0.8rem;
+  --font-small: 0.7rem;
 
   --radius: 4px;
   --radius-full: 50%;
@@ -145,7 +145,7 @@ body::after {
 }
 
 .weather-date {
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
   letter-spacing: 0.02em;
 }
@@ -163,7 +163,7 @@ body::after {
 }
 
 .weather-temp {
-  font-size: 2rem;
+  font-size: 1.2rem;
   font-weight: 300;
   color: var(--color-text);
 }
@@ -242,7 +242,7 @@ body::after {
 }
 
 .response-text {
-  font-size: 1.3rem;
+  font-size: 0.9rem;
   color: var(--color-assistant);
   line-height: 1.6;
 }
@@ -280,7 +280,7 @@ body::after {
   gap: 0.75rem;
   padding: 0 var(--space-section);
   background: rgba(22,33,62,0.85);
-  font-size: 1rem;
+  font-size: 0.75rem;
 }
 
 .status-dot {
