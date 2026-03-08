@@ -1,3 +1,19 @@
+@font-face {
+  font-family: "MOTHER PIXEL";
+  src: url("/fonts/MOTHER PIXEL2.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "PixelMplus12";
+  src: url("/fonts/PixelMplus12-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: block;
+}
+
 :root {
   --color-bg: #1a1a2e;
   --color-bg-surface: #16213e;
@@ -37,7 +53,7 @@ majel-status {
 }
 
 body {
-  font-family: "Helvetica Neue", Arial, "Hiragino Sans", sans-serif;
+  font-family: "MOTHER PIXEL", "PixelMplus12", "Helvetica Neue", Arial, "Hiragino Sans", sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
   width: 800px;
