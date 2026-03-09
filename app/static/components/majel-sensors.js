@@ -74,7 +74,8 @@ class MajelSensors extends HTMLElement {
   }
 
   _renderGraph(values) {
-    const bars = calculateBars(values);
+    const recent = values && values.length > 32 ? values.slice(-32) : values;
+    const bars = calculateBars(recent);
     const frag = document.createDocumentFragment();
     for (const { height, dim } of bars) {
       const bar = document.createElement("div");
