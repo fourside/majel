@@ -6,6 +6,6 @@ resources:
 
 images:
   - name: ghcr.io/fourside/majel-app
-    newTag: "dd1b41a80d7c1d761e4c98a4f9ec6766799e47b9"
+    newTag: "2b2d6779225de61f1c7ecdb8f2ae4c8747329adb"
   - name: ghcr.io/fourside/majel-sensors
-    newTag: "dd1b41a80d7c1d761e4c98a4f9ec6766799e47b9"
+    newTag: "2b2d6779225de61f1c7ecdb8f2ae4c8747329adb"
