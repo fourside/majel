@@ -1,4 +1,4 @@
-import { formatSensorValue } from "../lib/format.js";
+import { formatSensorParts } from "../lib/format.js";
 import { calculateBars } from "../lib/graph.js";
 
 const ICON_TEMP = `<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#f44336" stroke-width="1.8" stroke-linecap="round">
@@ -28,21 +28,21 @@ class MajelSensors extends HTMLElement {
       <div class="sensor-row">
         <div class="sensor-item">
           <span class="sensor-icon">${ICON_TEMP}</span>
-          <span class="sensor-value" data-key="temp">--°C</span>
+          <span class="sensor-value" data-key="temp">--<span class="sensor-unit">°C</span></span>
         </div>
         <div class="sensor-item">
           <span class="sensor-icon">${ICON_HUMIDITY}</span>
-          <span class="sensor-value" data-key="humidity">--%</span>
+          <span class="sensor-value" data-key="humidity">--<span class="sensor-unit">%</span></span>
         </div>
         <div class="sensor-item">
           <span class="sensor-icon">${ICON_PRESSURE}</span>
-          <span class="sensor-value" data-key="pressure">--hPa</span>
+          <span class="sensor-value" data-key="pressure">--<span class="sensor-unit">hPa</span></span>
         </div>
       </div>
       <div class="sensor-row">
         <div class="sensor-item">
           <span class="sensor-icon">${ICON_LIGHT}</span>
-          <span class="sensor-value" data-key="light">--lx</span>
+          <span class="sensor-value" data-key="light">--<span class="sensor-unit">lx</span></span>
         </div>
         <div class="light-graph"></div>
       </div>`;
@@ -66,11 +66,16 @@ class MajelSensors extends HTMLElement {
   /** @param {{ temperature?: number, humidity?: number, pressure?: number, light?: number, lightHistory?: number[] } | null} data */
   update(data) {
     const t = data?.temperature ?? null;
-    this._tempEl.textContent = formatSensorValue(t, "°C", 1);
-    this._humidityEl.textContent = formatSensorValue(data?.humidity ?? null, "%");
-    this._pressureEl.textContent = formatSensorValue(data?.pressure ?? null, "hPa");
-    this._lightEl.textContent = formatSensorValue(data?.light ?? null, "lx");
+    this._setSensorValue(this._tempEl, t, "°C", 1);
+    this._setSensorValue(this._humidityEl, data?.humidity ?? null, "%");
+    this._setSensorValue(this._pressureEl, data?.pressure ?? null, "hPa");
+    this._setSensorValue(this._lightEl, data?.light ?? null, "lx");
     this._renderGraph(data?.lightHistory ?? null);
+  }
+
+  _setSensorValue(el, value, unit, decimals = 0) {
+    const { num, unit: u } = formatSensorParts(value, unit, decimals);
+    el.innerHTML = `${num}<span class="sensor-unit">${u}</span>`;
   }
 
   _renderGraph(values) {

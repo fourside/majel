@@ -216,6 +216,10 @@ body::after {
   font-variant-numeric: tabular-nums;
 }
 
+.sensor-unit {
+  font-size: 1.2em;
+}
+
 .light-graph {
   display: flex;
   align-items: flex-end;
