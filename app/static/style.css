@@ -36,7 +36,7 @@
   --radius: 4px;
   --radius-full: 50%;
 
-  --space-section: 2rem;
+  --space-section: 1rem;
 }
 
 * {
@@ -53,7 +53,9 @@ majel-status {
 }
 
 body {
-  font-family: "MOTHER PIXEL", "PixelMplus12", "Helvetica Neue", Arial, "Hiragino Sans", sans-serif;
+  font-family:
+    "MOTHER PIXEL", "PixelMplus12", "Helvetica Neue", Arial, "Hiragino Sans",
+    sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
   width: 800px;
@@ -81,7 +83,11 @@ body::after {
   right: 0;
   height: 60%;
   z-index: 0;
-  background: linear-gradient(to top, rgba(26,26,46,0.95) 0%, transparent 100%);
+  background: linear-gradient(
+    to top,
+    rgba(26, 26, 46, 0.95) 0%,
+    transparent 100%
+  );
 }
 
 .dashboard {
@@ -99,23 +105,22 @@ body::after {
   grid-template-columns: 1fr auto;
   align-items: center;
   padding: 0 var(--space-section);
-  border-bottom: 1px solid rgba(22,33,62,0.6);
+  border-bottom: 1px solid rgba(22, 33, 62, 0.6);
 }
 
 /* ── Clock (flip digits) ── */
 .clock {
   font-size: var(--font-display);
   font-weight: 300;
-  letter-spacing: 0.05em;
   perspective: 400px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0;
 }
 
 .clock-digit {
   display: inline-block;
-  min-width: 0.65em;
+  min-width: 1em;
   text-align: center;
   color: var(--color-accent);
 }
@@ -126,14 +131,22 @@ body::after {
 
 .clock-sep {
   color: var(--color-accent);
-  padding: 0 2px;
+  margin-right: -0.1em;
   opacity: 0.6;
 }
 
 @keyframes flipIn {
-  0% { transform: rotateX(-90deg); opacity: 0.3; }
-  50% { transform: rotateX(10deg); }
-  100% { transform: rotateX(0deg); opacity: 1; }
+  0% {
+    transform: rotateX(-90deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: rotateX(10deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
 }
 
 /* ── Weather (date + icon + temp) ── */
@@ -153,7 +166,7 @@ body::after {
 .weather-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .weather-icon {
@@ -174,7 +187,7 @@ body::after {
   align-content: center;
   gap: 10px;
   padding: 0 var(--space-section);
-  border-bottom: 1px solid rgba(22,33,62,0.6);
+  border-bottom: 1px solid rgba(22, 33, 62, 0.6);
 }
 
 .sensor-row {
@@ -186,7 +199,7 @@ body::after {
 
 .sensor-item {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 6px;
 }
 
@@ -207,12 +220,14 @@ body::after {
   display: flex;
   align-items: flex-end;
   justify-self: end;
-  gap: 2px;
-  height: 40px;
+  gap: 1px;
+  height: 30px;
+  max-width: 200px;
+  overflow: hidden;
 }
 
 .light-graph .bar {
-  width: 4px;
+  width: 3px;
   background: var(--color-warning);
   border-radius: 2px 2px 0 0;
   min-height: 2px;
@@ -279,7 +294,7 @@ body::after {
   align-items: center;
   gap: 0.75rem;
   padding: 0 var(--space-section);
-  background: rgba(22,33,62,0.85);
+  background: rgba(22, 33, 62, 0.85);
   font-size: 0.75rem;
 }
 
@@ -328,7 +343,9 @@ body::after {
   cursor: pointer;
   display: grid;
   place-items: center;
-  transition: background 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    transform 0.1s;
 }
 
 .mic-button:hover {
@@ -352,12 +369,18 @@ body::after {
 }
 
 @keyframes mic-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4); }
-  50% { box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(244, 67, 54, 0);
+  }
 }
 
 @keyframes breathe {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -387,8 +410,13 @@ body::after {
 }
 
 @keyframes blink-caret {
-  0%, 100% { border-color: var(--color-assistant); }
-  50% { border-color: transparent; }
+  0%,
+  100% {
+    border-color: var(--color-assistant);
+  }
+  50% {
+    border-color: transparent;
+  }
 }
 
 /* ── Input toggle + panel ── */

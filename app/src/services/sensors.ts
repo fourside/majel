@@ -2,7 +2,7 @@ import { broadcast } from "../routes/ws.ts";
 
 const SENSORS_FILE = Deno.env.get("SENSORS_FILE") ?? "/tmp/majel/majel_sensors.json";
 const HISTORY_SIZE = 120; // 直近120件 = 1時間分（30秒間隔）
-const POLL_INTERVAL = 30_000; // 30秒
+const POLL_INTERVAL = Number(Deno.env.get("SENSOR_POLL_INTERVAL") ?? 30_000);
 
 interface SensorReading {
   temperature: number;
