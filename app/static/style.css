@@ -29,7 +29,7 @@
   --color-assistant: #c5e1a5;
 
   --font-display: 2.2rem;
-  --font-data: 0.9rem;
+  --font-data: 1.3rem;
   --font-body: 0.8rem;
   --font-small: 0.7rem;
 
@@ -217,7 +217,7 @@ body::after {
 }
 
 .sensor-unit {
-  font-size: 1.2em;
+  font-size: 0.9rem;
 }
 
 .light-graph {
