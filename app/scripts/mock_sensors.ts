@@ -5,7 +5,7 @@
  * Usage: deno task mock:sensors
  */
 
-const SENSORS_FILE = "/tmp/majel_sensors.json";
+const SENSORS_FILE = Deno.env.get("SENSORS_FILE") ?? "/tmp/majel/majel_sensors.json";
 const INTERVAL = 30_000;
 
 let baseTemp = 22 + Math.random() * 6; // 22〜28°C
