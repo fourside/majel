@@ -20,12 +20,18 @@ const submitButton = form.querySelector("button");
 let lastTranscription = "";
 let wsRetryDelay = 1000;
 const WS_RETRY_MAX = 60000;
+let wsConnectedOnce = false;
 
 function connectWs() {
   const protocol = location.protocol === "https:" ? "wss:" : "ws:";
   const ws = new WebSocket(`${protocol}//${location.host}/ws`);
 
   ws.onopen = () => {
+    if (wsConnectedOnce) {
+      location.reload();
+      return;
+    }
+    wsConnectedOnce = true;
     wsRetryDelay = 1000;
     statusEl.setStatus("done");
   };
