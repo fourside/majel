@@ -55,7 +55,7 @@ export async function record(options: RecordOptions = {}): Promise<string> {
   return output;
 }
 
-/** Windows 側で WAV ファイルを再生 */
+/** Windows 側で WAV ファイルを再生 (WSL 開発用) */
 export async function playAudio(wavPath: string): Promise<void> {
   const winSrc = await toWinPath(wavPath);
 
@@ -84,4 +84,35 @@ export async function playAudio(wavPath: string): Promise<void> {
   if (code !== 0) {
     throw new Error(`Audio playback failed: ${decoder.decode(stderr)}`);
   }
+}
+
+/** ALSA でスピーカー再生 (RPi 用) */
+async function playAlsa(wavPath: string): Promise<void> {
+  const device = Deno.env.get("ALSA_PLAYBACK_DEVICE") ?? "plughw:2,0";
+  const cmd = new Deno.Command("aplay", {
+    args: ["-D", device, wavPath],
+    stdout: "null",
+    stderr: "piped",
+  });
+  const { code, stderr } = await cmd.output();
+  if (code !== 0) {
+    throw new Error(`aplay failed: ${decoder.decode(stderr)}`);
+  }
+}
+
+/** TTS 結果のバイト列をスピーカーで再生（aplay があれば ALSA、なければスキップ） */
+export function playResponse(audioBytes: Uint8Array): void {
+  const tmpFile = "/tmp/majel_response.wav";
+  // Fire-and-forget: don't block the HTTP response
+  Deno.writeFile(tmpFile, audioBytes)
+    .then(() => playAlsa(tmpFile))
+    .then(() => console.log("Played response via ALSA"))
+    .catch((e: Error) => {
+      if (e.message.includes("not found") || e.message.includes("No such file")) {
+        console.log("ALSA playback not available, skipping speaker output");
+      } else {
+        console.error("ALSA playback error:", e.message);
+      }
+    })
+    .finally(() => Deno.remove(tmpFile).catch(() => {}));
 }
