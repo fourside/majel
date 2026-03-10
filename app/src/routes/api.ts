@@ -5,7 +5,7 @@ import { getSensorData } from "../services/sensors.ts";
 import { chat, clearHistory } from "../services/llm.ts";
 import { transcribe } from "../services/stt.ts";
 import { synthesize } from "../services/tts.ts";
-import { record } from "../services/audio.ts";
+import { record, playResponse } from "../services/audio.ts";
 import { setBrightness, setPower, getBrightness } from "../services/display.ts";
 import { suppressAutoBrightness } from "../services/auto-brightness.ts";
 import { broadcast } from "./ws.ts";
@@ -56,12 +56,23 @@ apiRoutes.post("/ask", async (c) => {
   }
 });
 
-/** 音声で質問 → 音声応答の完全パイプライン */
+/** 音声で質問 → 音声応答の完全パイプライン
+ *  - wakeword listener からの呼び出し: { wav_path: "/tmp/majel/wakeword_input.wav" }
+ *  - ブラウザ / 手動: 従来どおり PowerShell 録音 */
 apiRoutes.post("/voice", async (c) => {
   try {
-    // 1. 録音
-    broadcast("status", { phase: "listening" });
-    const wavPath = await record({ duration: 5, output: "/tmp/majel_input.wav" });
+    const body = await c.req.json().catch(() => ({}));
+    const externalWav = body.wav_path as string | undefined;
+
+    let wavPath: string;
+    if (externalWav) {
+      // wakeword listener が録音済み WAV を送ってきた
+      wavPath = externalWav;
+    } else {
+      // 従来の録音フロー (WSL / 手動テスト用)
+      broadcast("status", { phase: "listening" });
+      wavPath = await record({ duration: 5, output: "/tmp/majel_input.wav" });
+    }
 
     // 2. 文字起こし
     broadcast("status", { phase: "transcribing" });
@@ -74,11 +85,14 @@ apiRoutes.post("/voice", async (c) => {
     broadcast("status", { phase: "thinking", transcription: text });
     const response = await chat(text);
 
-    // 4. 音声合成（バイト列を返す）
+    // 4. 音声合成 → 再生
     broadcast("status", { phase: "speaking", response });
     const audioBytes = await synthesize(response);
-    const audioBase64 = encodeBase64(audioBytes);
 
+    // RPi 上ならスピーカーで再生 (fire-and-forget)
+    playResponse(audioBytes);
+
+    const audioBase64 = encodeBase64(audioBytes);
     return c.json({
       transcription: text,
       response,

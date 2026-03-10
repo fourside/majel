@@ -1,6 +1,11 @@
-FROM python:3.14-slim AS build
+FROM python:3.12-slim AS build
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+# System deps for pyalsaaudio build
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libasound2-dev gcc \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -15,10 +20,21 @@ COPY . .
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
-FROM python:3.14-slim
+FROM python:3.12-slim
+
+# Runtime deps: ALSA libs for pyalsaaudio
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libasound2 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=build /app /app
 ENV PATH="/app/.venv/bin:$PATH"
 
-CMD ["python", "main.py"]
+# Copy wakeword model
+COPY --from=build /app/models/ /app/models/
+
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+CMD ["/app/entrypoint.sh"]
