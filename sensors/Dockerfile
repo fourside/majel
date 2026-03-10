@@ -4,7 +4,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 # System deps for pyalsaaudio build
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      libasound2-dev gcc libc6-dev \
+      libasound2-dev gcc libc6-dev git \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -12,7 +12,7 @@ WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy
 
-COPY pyproject.toml ./
+COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --no-install-project --no-dev
 
