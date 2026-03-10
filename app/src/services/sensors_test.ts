@@ -1,5 +1,5 @@
-import { assertEquals } from "jsr:@std/assert";
-import { _validateReading, _addToLightHistory } from "./sensors.ts";
+import { assertEquals } from "@std/assert";
+import { _addToLightHistory, _validateReading } from "./sensors.ts";
 
 // ── validateReading ──
 

@@ -1,4 +1,4 @@
-import { setBrightness, isDisplayOn } from "./display.ts";
+import { isDisplayOn, setBrightness } from "./display.ts";
 import { getSensorData } from "./sensors.ts";
 
 /**

@@ -128,4 +128,8 @@ export function isDisplayOn(): boolean {
 }
 
 // テスト用にexport
-export { evaluateSchedule as _evaluateSchedule, timeToMinutes as _timeToMinutes, isInRange as _isInRange };
+export {
+  evaluateSchedule as _evaluateSchedule,
+  isInRange as _isInRange,
+  timeToMinutes as _timeToMinutes,
+};

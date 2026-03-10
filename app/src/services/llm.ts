@@ -1,8 +1,9 @@
 import OpenAI from "openai";
 import { config } from "../config.ts";
-import { toolDefinitions, executeTool } from "../tools/definitions.ts";
+import { executeTool, toolDefinitions } from "../tools/definitions.ts";
 
-const SYSTEM_PROMPT = `あなたはMAJEL（メイジェル）という名前の音声アシスタントです。
+const SYSTEM_PROMPT =
+  `あなたはMAJEL（メイジェル）という名前の音声アシスタントです。
 Mostly Adequate Japanese Environment Listener の略です。
 
 応答のルール:
@@ -70,7 +71,9 @@ export async function chat(userMessage: string): Promise<string> {
     const toolResults = await Promise.all(
       message.tool_calls.map(async (toolCall) => {
         const args = JSON.parse(toolCall.function.arguments);
-        console.log(`Tool call: ${toolCall.function.name}(${JSON.stringify(args)})`);
+        console.log(
+          `Tool call: ${toolCall.function.name}(${JSON.stringify(args)})`,
+        );
         const result = await executeTool(toolCall.function.name, args);
         console.log(`Tool result: ${result}`);
         return { tool_call_id: toolCall.id, content: result };
@@ -82,7 +85,8 @@ export async function chat(userMessage: string): Promise<string> {
   }
 
   // MAX_TOOL_ROUNDS に達した場合のフォールバック
-  const fallback = "すみません、処理が複雑すぎるようです。もう少し簡単に聞いていただけますか？";
+  const fallback =
+    "すみません、処理が複雑すぎるようです。もう少し簡単に聞いていただけますか？";
   conversationHistory.push({ role: "assistant", content: fallback });
   return fallback;
 }
@@ -93,4 +97,7 @@ export function clearHistory(): void {
 }
 
 // テスト用にexport
-export { conversationHistory as _conversationHistory, trimHistory as _trimHistory };
+export {
+  conversationHistory as _conversationHistory,
+  trimHistory as _trimHistory,
+};

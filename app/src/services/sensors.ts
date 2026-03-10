@@ -1,6 +1,7 @@
 import { broadcast } from "../routes/ws.ts";
 
-const SENSORS_FILE = Deno.env.get("SENSORS_FILE") ?? "/tmp/majel/majel_sensors.json";
+const SENSORS_FILE = Deno.env.get("SENSORS_FILE") ??
+  "/tmp/majel/majel_sensors.json";
 const HISTORY_SIZE = 120; // 直近120件 = 1時間分（30秒間隔）
 const POLL_INTERVAL = Number(Deno.env.get("SENSOR_POLL_INTERVAL") ?? 30_000);
 
@@ -37,7 +38,11 @@ function validateReading(data: Record<string, unknown>): SensorReading | null {
 }
 
 /** 照度履歴に値を追加し、maxSize を超えたら古い値を削除する */
-function addToLightHistory(history: number[], value: number, maxSize: number): void {
+function addToLightHistory(
+  history: number[],
+  value: number,
+  maxSize: number,
+): void {
   history.push(value);
   if (history.length > maxSize) {
     history.shift();
@@ -84,4 +89,7 @@ export function startSensorService(): void {
 }
 
 // テスト用にexport
-export { validateReading as _validateReading, addToLightHistory as _addToLightHistory };
+export {
+  addToLightHistory as _addToLightHistory,
+  validateReading as _validateReading,
+};

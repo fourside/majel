@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@hono/hono@4": "4.12.4",
     "jsr:@std/assert@*": "1.0.19",
+    "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/dotenv@*": "0.225.6",
     "jsr:@std/dotenv@0.225": "0.225.6",
     "jsr:@std/encoding@1": "1.0.10",
@@ -258,7 +259,9 @@
   "workspace": {
     "dependencies": [
       "jsr:@hono/hono@4",
+      "jsr:@std/assert@1",
       "jsr:@std/dotenv@0.225",
+      "jsr:@std/encoding@1",
       "npm:openai@4"
     ]
   }

@@ -1,12 +1,12 @@
 import { Hono } from "@hono/hono";
-import { encodeBase64 } from "jsr:@std/encoding@^1/base64";
+import { encodeBase64 } from "@std/encoding/base64";
 import { getWeather } from "../services/weather.ts";
 import { getSensorData } from "../services/sensors.ts";
 import { chat, clearHistory } from "../services/llm.ts";
 import { transcribe } from "../services/stt.ts";
 import { synthesize } from "../services/tts.ts";
-import { record, playResponse } from "../services/audio.ts";
-import { setBrightness, setPower, getBrightness } from "../services/display.ts";
+import { playResponse, record } from "../services/audio.ts";
+import { getBrightness, setBrightness, setPower } from "../services/display.ts";
 import { suppressAutoBrightness } from "../services/auto-brightness.ts";
 import { broadcast } from "./ws.ts";
 
@@ -50,7 +50,9 @@ apiRoutes.post("/ask", async (c) => {
     return c.json({ response });
   } catch (e) {
     console.error("ask error:", e);
-    return c.json({ error: "うまく処理できませんでした。もう一度お願いします。" }, 500);
+    return c.json({
+      error: "うまく処理できませんでした。もう一度お願いします。",
+    }, 500);
   } finally {
     broadcast("status", { phase: "done" });
   }
@@ -110,7 +112,10 @@ apiRoutes.post("/voice", async (c) => {
 apiRoutes.post("/display/brightness", async (c) => {
   const body = await c.req.json();
   const value = body.value;
-  if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 100) {
+  if (
+    typeof value !== "number" || !Number.isFinite(value) || value < 0 ||
+    value > 100
+  ) {
     return c.json({ error: "value must be a number between 0-100" }, 400);
   }
   suppressAutoBrightness();

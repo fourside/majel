@@ -1,10 +1,16 @@
 """MAJEL sensor reader — HTU21D, BMP180, BH1750 via I2C."""
 
+from __future__ import annotations
+
 import json
-import time
 import sys
-from datetime import datetime, timezone, timedelta
+import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import smbus2
 
 SENSOR_FILE = Path("/tmp/majel/majel_sensors.json")
 INTERVAL = 30
@@ -16,9 +22,10 @@ BMP180_ADDR = 0x77
 BH1750_ADDR = 0x23
 
 
-def create_bus():
+def create_bus() -> smbus2.SMBus | None:
     try:
         import smbus2
+
         return smbus2.SMBus(1)
     except (ImportError, FileNotFoundError, OSError) as e:
         print(f"I2C not available: {e}", file=sys.stderr)
@@ -26,7 +33,7 @@ def create_bus():
 
 
 # ── HTU21D (温度・湿度) ──
-def read_htu21d(bus):
+def read_htu21d(bus: smbus2.SMBus) -> tuple[float | None, float | None]:
     try:
         # Hold Master mode: sensor holds SCL until measurement complete
         data = bus.read_i2c_block_data(HTU21D_ADDR, 0xE3, 3)
@@ -45,7 +52,7 @@ def read_htu21d(bus):
 
 
 # ── BMP180 (温度・気圧) ──
-def read_bmp180_calibration(bus):
+def read_bmp180_calibration(bus: smbus2.SMBus) -> dict[str, int]:
     data = bus.read_i2c_block_data(BMP180_ADDR, 0xAA, 22)
     return {
         "AC1": int.from_bytes(data[0:2], "big", signed=True),
@@ -65,7 +72,7 @@ def read_bmp180_calibration(bus):
 _bmp180_cal = None
 
 
-def read_bmp180(bus):
+def read_bmp180(bus: smbus2.SMBus) -> tuple[float | None, float | None]:
     global _bmp180_cal
     try:
         if _bmp180_cal is None:
@@ -115,7 +122,7 @@ def read_bmp180(bus):
 
 
 # ── BH1750 (照度) ──
-def read_bh1750(bus):
+def read_bh1750(bus: smbus2.SMBus) -> float | None:
     try:
         bus.write_byte(BH1750_ADDR, 0x10)
         time.sleep(0.2)
@@ -128,7 +135,7 @@ def read_bh1750(bus):
 
 
 # ── メインループ ──
-def main():
+def main() -> None:
     SENSOR_FILE.parent.mkdir(parents=True, exist_ok=True)
     bus = create_bus()
 
