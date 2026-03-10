@@ -120,7 +120,7 @@ def main() -> None:
             time.sleep(60)
 
     print(f"[wakeword] Loading model: {WAKEWORD_MODEL}")
-    model = Model(wakeword_models=[str(WAKEWORD_MODEL)])
+    model = Model(wakeword_models=[str(WAKEWORD_MODEL)], inference_framework="onnxruntime")
     model_name = list(model.models.keys())[0]
     print(f"[wakeword] Model loaded: {model_name}")
 
