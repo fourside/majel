@@ -1,8 +1,10 @@
-name: CI
+name: CI App
 
 on:
   pull_request:
     branches: [main]
+    paths:
+      - "app/**"
 
 jobs:
   app:
@@ -12,9 +14,9 @@ jobs:
       run:
         working-directory: app
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
-      - uses: denoland/setup-deno@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v2
+      - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
@@ -26,23 +28,3 @@ jobs:
 
       - name: Test
         run: deno test --allow-read --allow-env src/ static/lib/
-
-  sensors:
-    name: Sensors (Python)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: sensors
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - uses: astral-sh/setup-uv@0ca8f610542aa7f4acaf39e65cf4eb3c35091883 # v7
-
-      - name: Ruff format check
-        run: uvx ruff format --check .
-
-      - name: Ruff lint
-        run: uvx ruff check --output-format github .
-
-      - name: Type check
-        run: uvx ty check --python-version 3.12 --output-format github .

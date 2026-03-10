@@ -1,0 +1,28 @@
+name: CI Sensors
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "sensors/**"
+
+jobs:
+  sensors:
+    name: Sensors (Python)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sensors
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Ruff format check
+        run: uvx ruff format --check .
+
+      - name: Ruff lint
+        run: uvx ruff check --output-format github .
+
+      - name: Type check
+        run: uvx ty check --python-version 3.12 --output-format github .
