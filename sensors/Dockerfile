@@ -4,7 +4,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 # System deps for pyalsaaudio build
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      libasound2-dev gcc \
+      libasound2-dev gcc libc6-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
