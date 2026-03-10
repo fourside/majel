@@ -40,7 +40,10 @@ export interface WeatherData {
 
 /** インメモリキャッシュ（10分有効） */
 const CACHE_TTL_MS = 10 * 60 * 1000;
-const weatherCache = new Map<string, { data: WeatherData; fetchedAt: number }>();
+const weatherCache = new Map<
+  string,
+  { data: WeatherData; fetchedAt: number }
+>();
 
 /** Open-Meteo API から現在の天気情報を取得（キャッシュ付き） */
 export async function getWeather(
@@ -77,7 +80,9 @@ export async function getWeather(
     `https://api.open-meteo.com/v1/jma?${params}`,
   );
   if (!res.ok) {
-    throw new Error(`Open-Meteo API error (${res.status}): ${await res.text()}`);
+    throw new Error(
+      `Open-Meteo API error (${res.status}): ${await res.text()}`,
+    );
   }
 
   const data = await res.json();

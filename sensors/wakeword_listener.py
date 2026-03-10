@@ -1,14 +1,20 @@
 """MAJEL wakeword listener — detects 'hey majel' and triggers voice pipeline."""
 
+from __future__ import annotations
+
 import os
 import sys
 import time
 import wave
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-import numpy as np
 import httpx
+import numpy as np
 from openwakeword.model import Model
+
+if TYPE_CHECKING:
+    import alsaaudio
 
 # ── Settings ──
 WAKEWORD_MODEL = Path("/app/models/hey_majel.onnx")
@@ -23,7 +29,7 @@ WAV_OUTPUT = Path("/tmp/majel/wakeword_input.wav")
 AUDIO_DEVICE = os.environ.get("ALSA_CAPTURE_DEVICE", "plughw:3,0")
 
 
-def open_mic_stream():
+def open_mic_stream() -> alsaaudio.PCM:
     """Open ALSA mic stream for continuous monitoring."""
     import alsaaudio
 
@@ -47,7 +53,7 @@ def rms(data: bytes) -> float:
     return float(np.sqrt(np.mean(samples.astype(np.float64) ** 2)))
 
 
-def record_utterance(mic) -> Path:
+def record_utterance(mic: alsaaudio.PCM) -> Path:
     """Record audio until silence is detected (VAD-based endpoint)."""
     print("[wakeword] Recording utterance...")
     frames = []
@@ -88,7 +94,7 @@ def record_utterance(mic) -> Path:
     return WAV_OUTPUT
 
 
-def trigger_voice_pipeline(wav_path: Path):
+def trigger_voice_pipeline(wav_path: Path) -> None:
     """Send recorded WAV to app's voice endpoint."""
     try:
         print(f"[wakeword] Triggering voice pipeline: {wav_path}")
@@ -106,7 +112,7 @@ def trigger_voice_pipeline(wav_path: Path):
         print(f"[wakeword] Connection error: {e}", file=sys.stderr)
 
 
-def main():
+def main() -> None:
     if not WAKEWORD_MODEL.exists():
         print(f"[wakeword] Model not found: {WAKEWORD_MODEL}", file=sys.stderr)
         print("[wakeword] Running in stub mode (no wakeword detection)")

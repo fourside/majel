@@ -1,5 +1,5 @@
-import { assertEquals } from "jsr:@std/assert";
-import { toolDefinitions, executeTool } from "./definitions.ts";
+import { assertEquals } from "@std/assert";
+import { executeTool, toolDefinitions } from "./definitions.ts";
 
 // ── toolDefinitions structure ──
 

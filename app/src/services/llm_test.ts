@@ -1,5 +1,5 @@
-import { assertEquals } from "jsr:@std/assert";
-import { clearHistory, _conversationHistory, _trimHistory } from "./llm.ts";
+import { assertEquals } from "@std/assert";
+import { _conversationHistory, _trimHistory, clearHistory } from "./llm.ts";
 
 // ── trimHistory ──
 

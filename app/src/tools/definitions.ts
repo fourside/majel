@@ -60,7 +60,8 @@ export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
     type: "function",
     function: {
       name: "set_display_brightness",
-      description: "ディスプレイの明るさを設定する。0〜100のパーセント値で指定する。",
+      description:
+        "ディスプレイの明るさを設定する。0〜100のパーセント値で指定する。",
       parameters: {
         type: "object",
         properties: {
@@ -122,7 +123,9 @@ export async function executeTool(
     case "get_environment": {
       const env = getSensorData();
       if (env.temperature === null) {
-        return JSON.stringify({ error: "環境センサーのデータが取得できませんでした。" });
+        return JSON.stringify({
+          error: "環境センサーのデータが取得できませんでした。",
+        });
       }
       const result: Record<string, unknown> = {
         temperature: env.temperature,

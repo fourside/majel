@@ -1,4 +1,4 @@
-import { config, assertApiKey } from "./config.ts";
+import { assertApiKey, config } from "./config.ts";
 import { app } from "./server.ts";
 import { startSensorService } from "./services/sensors.ts";
 import { startScheduler } from "./services/display.ts";

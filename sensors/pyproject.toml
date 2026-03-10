@@ -9,3 +9,17 @@ dependencies = [
     "httpx",
     "numpy",
 ]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.ty.environment]
+python-version = "3.12"
+
+[tool.ty.rules]
+# Third-party packages (smbus2, alsaaudio, openwakeword) have no type stubs
+# and may not be installable in CI (e.g. pyalsaaudio needs ALSA headers)
+unresolved-import = "ignore"

@@ -2,9 +2,7 @@ const decoder = new TextDecoder();
 
 /** WSL パスを Windows パス (\\wsl$\...) に変換 */
 async function toWinPath(wslPath: string): Promise<string> {
-  const abs = wslPath.startsWith("/")
-    ? wslPath
-    : `${Deno.cwd()}/${wslPath}`;
+  const abs = wslPath.startsWith("/") ? wslPath : `${Deno.cwd()}/${wslPath}`;
   const cmd = new Deno.Command("wslpath", {
     args: ["-w", abs],
     stdout: "piped",
@@ -66,7 +64,9 @@ export async function playAudio(wavPath: string): Promise<void> {
       [
         `Add-Type -AssemblyName PresentationCore`,
         `$tmp = Join-Path $env:TEMP 'majel_response.wav'`,
-        `Copy-Item -LiteralPath '${winSrc.replace(/'/g, "''")}' -Destination $tmp -Force`,
+        `Copy-Item -LiteralPath '${
+          winSrc.replace(/'/g, "''")
+        }' -Destination $tmp -Force`,
         `$p = New-Object System.Windows.Media.MediaPlayer`,
         `$p.Open([Uri]::new($tmp))`,
         `Start-Sleep -Milliseconds 200`,
@@ -108,7 +108,9 @@ export function playResponse(audioBytes: Uint8Array): void {
     .then(() => playAlsa(tmpFile))
     .then(() => console.log("Played response via ALSA"))
     .catch((e: Error) => {
-      if (e.message.includes("not found") || e.message.includes("No such file")) {
+      if (
+        e.message.includes("not found") || e.message.includes("No such file")
+      ) {
         console.log("ALSA playback not available, skipping speaker output");
       } else {
         console.error("ALSA playback error:", e.message);
