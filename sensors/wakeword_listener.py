@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import sys
+import threading
 import time
 import wave
 from pathlib import Path
@@ -120,7 +121,7 @@ def main() -> None:
             time.sleep(60)
 
     print(f"[wakeword] Loading model: {WAKEWORD_MODEL}")
-    model = Model(wakeword_models=[str(WAKEWORD_MODEL)], inference_framework="onnxruntime")
+    model = Model(wakeword_models=[str(WAKEWORD_MODEL)], inference_framework="onnx")
     model_name = list(model.models.keys())[0]
     print(f"[wakeword] Model loaded: {model_name}")
 
@@ -154,8 +155,10 @@ def main() -> None:
                 # Record the utterance
                 wav_path = record_utterance(mic)
 
-                # Trigger voice pipeline
-                trigger_voice_pipeline(wav_path)
+                # Trigger voice pipeline in background so listening resumes immediately
+                threading.Thread(
+                    target=trigger_voice_pipeline, args=(wav_path,), daemon=True
+                ).start()
 
                 print("[wakeword] Resuming listening...")
 
