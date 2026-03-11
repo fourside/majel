@@ -21,7 +21,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
 # Download openwakeword preprocessor models (melspectrogram + embedding)
-RUN python -c "import openwakeword; openwakeword.utils.download_models()"
+RUN .venv/bin/python -c "import openwakeword; openwakeword.utils.download_models()"
 
 FROM python:3.12-slim
 
