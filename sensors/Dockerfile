@@ -31,9 +31,6 @@ WORKDIR /app
 COPY --from=build /app /app
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Copy wakeword model
-COPY --from=build /app/models/ /app/models/
-
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
