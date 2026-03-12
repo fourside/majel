@@ -38,11 +38,11 @@ def open_mic_stream() -> alsaaudio.PCM:
         alsaaudio.PCM_CAPTURE,
         alsaaudio.PCM_NORMAL,
         device=AUDIO_DEVICE,
+        channels=1,
+        rate=SAMPLE_RATE,
+        format=alsaaudio.PCM_FORMAT_S16_LE,
+        periodsize=FRAME_SIZE,
     )
-    inp.setchannels(1)
-    inp.setrate(SAMPLE_RATE)
-    inp.setformat(alsaaudio.PCM_FORMAT_S16_LE)
-    inp.setperiodsize(FRAME_SIZE)
     return inp
 
 
