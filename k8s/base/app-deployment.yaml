@@ -14,6 +14,8 @@ spec:
       labels:
         app: majel
     spec:
+      securityContext:
+        supplementalGroups: [29]  # audio group — needed for aplay in app container
       containers:
         - name: app
           image: ghcr.io/fourside/majel-app:latest
