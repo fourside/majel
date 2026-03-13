@@ -1,4 +1,4 @@
-"""MAJEL wakeword listener — detects 'hey majel' and triggers voice pipeline."""
+"""MAJEL wakeword listener — detects wakeword and triggers voice pipeline."""
 
 from __future__ import annotations
 
@@ -18,8 +18,8 @@ if TYPE_CHECKING:
     import alsaaudio
 
 # ── Settings ──
-WAKEWORD_MODEL = Path("/app/models/hey_majel.onnx")
-THRESHOLD = 0.3
+WAKEWORD_MODEL = "hey_jarvis_v0.1"
+THRESHOLD = 0.5
 SAMPLE_RATE = 16000
 FRAME_SIZE = 1280  # 80ms at 16kHz
 RECORD_SILENCE_TIMEOUT = 2.0  # seconds of silence to stop recording
@@ -114,20 +114,10 @@ def trigger_voice_pipeline(wav_path: Path) -> None:
 
 
 def main() -> None:
-    if not WAKEWORD_MODEL.exists():
-        print(f"[wakeword] Model not found: {WAKEWORD_MODEL}", file=sys.stderr)
-        print("[wakeword] Running in stub mode (no wakeword detection)")
-        while True:
-            time.sleep(60)
-
-    # Load hey_majel + hey_jarvis (reference) models for comparison
     print(f"[wakeword] Loading model: {WAKEWORD_MODEL}")
-    model = Model(
-        wakeword_models=[str(WAKEWORD_MODEL), "hey_jarvis_v0.1"],
-        inference_framework="onnx",
-    )
-    model_names = list(model.models.keys())
-    print(f"[wakeword] Models loaded: {model_names}")
+    model = Model(wakeword_models=[WAKEWORD_MODEL], inference_framework="onnx")
+    model_name = list(model.models.keys())[0]
+    print(f"[wakeword] Model loaded: {model_name}")
 
     mic = None
     for attempt in range(30):
@@ -144,37 +134,7 @@ def main() -> None:
         print("[wakeword] Mic unavailable after retries, exiting", file=sys.stderr)
         sys.exit(1)
 
-    # Diagnostic: record 5s of audio at startup for offline analysis
-    diag_path = Path("/tmp/majel/diag_startup.wav")
-    diag_path.parent.mkdir(parents=True, exist_ok=True)
-    print("[wakeword] Recording 5s diagnostic audio...")
-    diag_frames = []
-    diag_start = time.monotonic()
-    while time.monotonic() - diag_start < 5:
-        length, data = mic.read()
-        if length > 0:
-            diag_frames.append(data)
-            audio = np.frombuffer(data, dtype=np.int16)
-            energy = float(np.sqrt(np.mean(audio.astype(np.float64) ** 2)))
-            pred = model.predict(audio)
-            scores = {k: pred[k] for k in model_names}
-            elapsed = time.monotonic() - diag_start
-            print(
-                f"[diag] t={elapsed:.1f}s energy={energy:.0f}"
-                f" min={audio.min()} max={audio.max()}"
-                f" scores={scores}"
-            )
-    with wave.open(str(diag_path), "wb") as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(SAMPLE_RATE)
-        wf.writeframes(b"".join(diag_frames))
-    print(f"[wakeword] Diagnostic audio saved: {diag_path} ({len(diag_frames)} frames)")
-
     print(f"[wakeword] Listening on {AUDIO_DEVICE} (threshold={THRESHOLD})...")
-
-    frame_count = 0
-    energy_log_interval = 200  # log energy every ~200 frames (~16s at 80ms/frame)
 
     while True:
         try:
@@ -182,37 +142,17 @@ def main() -> None:
             if length <= 0:
                 continue
 
-            # Feed audio to wakeword model
             audio_array = np.frombuffer(data, dtype=np.int16)
-            energy = float(np.sqrt(np.mean(audio_array.astype(np.float64) ** 2)))
-
-            frame_count += 1
-            if frame_count % energy_log_interval == 0:
-                print(f"[wakeword] heartbeat frame={frame_count} energy={energy:.0f}")
-            elif energy > 1000:
-                print(f"[wakeword] voice? frame={frame_count} energy={energy:.0f}")
-
             prediction = model.predict(audio_array)
 
-            scores = {k: prediction[k] for k in model_names}
-            majel_score = scores.get("hey_majel", 0)
-            jarvis_score = scores.get("hey_jarvis_v0.1", 0)
-            any_notable = any(s > 0.01 for s in scores.values())
-            if energy > 1000 or any_notable:
-                print(
-                    f"[wakeword] majel={majel_score:.4f} jarvis={jarvis_score:.4f}"
-                    f" energy={energy:.0f}"
-                )
-            if majel_score > THRESHOLD:
-                print(f"[wakeword] Detected! (score={majel_score:.3f})")
+            score = prediction[model_name]
+            if score > THRESHOLD:
+                print(f"[wakeword] Detected! (score={score:.3f})")
 
-                # Reset model to avoid re-triggering
                 model.reset()
 
-                # Record the utterance
                 wav_path = record_utterance(mic)
 
-                # Trigger voice pipeline in background so listening resumes immediately
                 threading.Thread(
                     target=trigger_voice_pipeline, args=(wav_path,), daemon=True
                 ).start()
