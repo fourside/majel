@@ -131,13 +131,19 @@ def main() -> None:
             mic = open_mic_stream()
             break
         except Exception as e:
-            print(f"[wakeword] Mic not available (attempt {attempt + 1}/30): {e}", file=sys.stderr)
+            print(
+                f"[wakeword] Mic not available (attempt {attempt + 1}/30): {e}",
+                file=sys.stderr,
+            )
             time.sleep(2)
     if mic is None:
         print("[wakeword] Mic unavailable after retries, exiting", file=sys.stderr)
         sys.exit(1)
 
     print(f"[wakeword] Listening on {AUDIO_DEVICE} (threshold={THRESHOLD})...")
+
+    frame_count = 0
+    energy_log_interval = 200  # log energy every ~200 frames (~16s at 80ms/frame)
 
     while True:
         try:
@@ -147,11 +153,16 @@ def main() -> None:
 
             # Feed audio to wakeword model
             audio_array = np.frombuffer(data, dtype=np.int16)
+            energy = float(np.sqrt(np.mean(audio_array.astype(np.float64) ** 2)))
+
+            frame_count += 1
+            if frame_count % energy_log_interval == 0:
+                print(f"[wakeword] heartbeat frame={frame_count} energy={energy:.0f}")
+
             prediction = model.predict(audio_array)
 
             score = prediction[model_name]
             if score > 0.01:
-                energy = float(np.sqrt(np.mean(audio_array.astype(np.float64) ** 2)))
                 print(f"[wakeword] score={score:.4f} energy={energy:.0f}")
             if score > THRESHOLD:
                 print(f"[wakeword] Detected! (score={score:.3f})")
