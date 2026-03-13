@@ -150,6 +150,9 @@ def main() -> None:
             prediction = model.predict(audio_array)
 
             score = prediction[model_name]
+            if score > 0.01:
+                energy = float(np.sqrt(np.mean(audio_array.astype(np.float64) ** 2)))
+                print(f"[wakeword] score={score:.4f} energy={energy:.0f}")
             if score > THRESHOLD:
                 print(f"[wakeword] Detected! (score={score:.3f})")
 
