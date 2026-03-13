@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-repo-server
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: install-ksops
+          image: curlimages/curl:latest
+          command: ["sh", "-c"]
+          args:
+            - >-
+              curl -sSL
+              https://github.com/viaduct-ai/kustomize-sops/releases/download/v4.4.0/ksops_4.4.0_Linux_arm64.tar.gz
+              | tar xz -C /custom-tools ksops
+          volumeMounts:
+            - mountPath: /custom-tools
+              name: custom-tools
+      containers:
+        - name: argocd-repo-server
+          volumeMounts:
+            - mountPath: /usr/local/bin/ksops
+              name: custom-tools
+              subPath: ksops
+            - mountPath: /home/argocd/.config/sops/age
+              name: age-key
+      volumes:
+        - name: custom-tools
+          emptyDir: {}
+        - name: age-key
+          secret:
+            secretName: age-key
