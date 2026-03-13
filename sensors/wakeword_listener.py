@@ -120,10 +120,14 @@ def main() -> None:
         while True:
             time.sleep(60)
 
+    # Load hey_majel + hey_jarvis (reference) models for comparison
     print(f"[wakeword] Loading model: {WAKEWORD_MODEL}")
-    model = Model(wakeword_models=[str(WAKEWORD_MODEL)], inference_framework="onnx")
-    model_name = list(model.models.keys())[0]
-    print(f"[wakeword] Model loaded: {model_name}")
+    model = Model(
+        wakeword_models=[str(WAKEWORD_MODEL), "hey_jarvis_v0.1"],
+        inference_framework="onnx",
+    )
+    model_names = list(model.models.keys())
+    print(f"[wakeword] Models loaded: {model_names}")
 
     mic = None
     for attempt in range(30):
@@ -163,13 +167,17 @@ def main() -> None:
 
             prediction = model.predict(audio_array)
 
-            score = prediction[model_name]
-            if energy > 1000:
-                print(f"[wakeword] score={score:.4f} energy={energy:.0f}")
-            elif score > 0.01:
-                print(f"[wakeword] score={score:.4f} energy={energy:.0f}")
-            if score > THRESHOLD:
-                print(f"[wakeword] Detected! (score={score:.3f})")
+            scores = {k: prediction[k] for k in model_names}
+            majel_score = scores.get("hey_majel", 0)
+            jarvis_score = scores.get("hey_jarvis_v0.1", 0)
+            any_notable = any(s > 0.01 for s in scores.values())
+            if energy > 1000 or any_notable:
+                print(
+                    f"[wakeword] majel={majel_score:.4f} jarvis={jarvis_score:.4f}"
+                    f" energy={energy:.0f}"
+                )
+            if majel_score > THRESHOLD:
+                print(f"[wakeword] Detected! (score={majel_score:.3f})")
 
                 # Reset model to avoid re-triggering
                 model.reset()
