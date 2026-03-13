@@ -6,7 +6,6 @@ import base64
 import os
 import subprocess
 import sys
-import threading
 import time
 import wave
 from pathlib import Path
@@ -181,9 +180,16 @@ def main() -> None:
 
                 wav_path = record_utterance(mic)
 
-                threading.Thread(
-                    target=trigger_voice_pipeline, args=(wav_path,), daemon=True
-                ).start()
+                # Run synchronously — pauses wakeword detection during
+                # API call + audio playback to prevent echo re-trigger
+                trigger_voice_pipeline(wav_path)
+
+                # Drain mic buffer accumulated during pipeline execution
+                model.reset()
+                while True:
+                    n, _ = mic.read()
+                    if n <= 0:
+                        break
 
                 print("[wakeword] Resuming listening...")
 
