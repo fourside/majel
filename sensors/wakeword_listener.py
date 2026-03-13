@@ -125,13 +125,17 @@ def main() -> None:
     model_name = list(model.models.keys())[0]
     print(f"[wakeword] Model loaded: {model_name}")
 
-    try:
-        mic = open_mic_stream()
-    except Exception as e:
-        print(f"[wakeword] Mic not available: {e}", file=sys.stderr)
-        print("[wakeword] Running in stub mode (no microphone)")
-        while True:
-            time.sleep(60)
+    mic = None
+    for attempt in range(30):
+        try:
+            mic = open_mic_stream()
+            break
+        except Exception as e:
+            print(f"[wakeword] Mic not available (attempt {attempt + 1}/30): {e}", file=sys.stderr)
+            time.sleep(2)
+    if mic is None:
+        print("[wakeword] Mic unavailable after retries, exiting", file=sys.stderr)
+        sys.exit(1)
 
     print(f"[wakeword] Listening on {AUDIO_DEVICE} (threshold={THRESHOLD})...")
 
