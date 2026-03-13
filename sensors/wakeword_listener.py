@@ -158,6 +158,8 @@ def main() -> None:
             frame_count += 1
             if frame_count % energy_log_interval == 0:
                 print(f"[wakeword] heartbeat frame={frame_count} energy={energy:.0f}")
+            elif energy > 1000:
+                print(f"[wakeword] voice? frame={frame_count} energy={energy:.0f}")
 
             prediction = model.predict(audio_array)
 
