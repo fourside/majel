@@ -131,7 +131,10 @@ def main() -> None:
             mic = open_mic_stream()
             break
         except Exception as e:
-            print(f"[wakeword] Mic not available (attempt {attempt + 1}/30): {e}", file=sys.stderr)
+            print(
+                f"[wakeword] Mic not available (attempt {attempt + 1}/30): {e}",
+                file=sys.stderr,
+            )
             time.sleep(2)
     if mic is None:
         print("[wakeword] Mic unavailable after retries, exiting", file=sys.stderr)
