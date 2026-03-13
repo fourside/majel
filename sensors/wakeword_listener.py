@@ -164,7 +164,9 @@ def main() -> None:
             prediction = model.predict(audio_array)
 
             score = prediction[model_name]
-            if score > 0.01:
+            if energy > 1000:
+                print(f"[wakeword] score={score:.4f} energy={energy:.0f}")
+            elif score > 0.01:
                 print(f"[wakeword] score={score:.4f} energy={energy:.0f}")
             if score > THRESHOLD:
                 print(f"[wakeword] Detected! (score={score:.3f})")
