@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import base64
 import os
+import subprocess
 import sys
 import threading
 import time
@@ -95,8 +97,27 @@ def record_utterance(mic: alsaaudio.PCM) -> Path:
     return WAV_OUTPUT
 
 
+PLAYBACK_DEVICE = os.environ.get("ALSA_PLAYBACK_DEVICE", "plughw:2,0")
+RESPONSE_WAV = Path("/tmp/majel/response.wav")
+
+
+def play_wav(wav_path: Path) -> None:
+    """Play WAV file through ALSA speaker."""
+    try:
+        subprocess.run(
+            ["aplay", "-D", PLAYBACK_DEVICE, str(wav_path)],
+            check=True,
+            capture_output=True,
+        )
+        print("[wakeword] Played response audio")
+    except subprocess.CalledProcessError as e:
+        print(f"[wakeword] aplay error: {e.stderr.decode()}", file=sys.stderr)
+    except FileNotFoundError:
+        print("[wakeword] aplay not found, skipping playback", file=sys.stderr)
+
+
 def trigger_voice_pipeline(wav_path: Path) -> None:
-    """Send recorded WAV to app's voice endpoint."""
+    """Send recorded WAV to app's voice endpoint and play response."""
     try:
         print(f"[wakeword] Triggering voice pipeline: {wav_path}")
         resp = httpx.post(
@@ -107,6 +128,13 @@ def trigger_voice_pipeline(wav_path: Path) -> None:
         if resp.is_success:
             data = resp.json()
             print(f"[wakeword] Response: {data.get('response', '')[:80]}")
+
+            # Play TTS audio response
+            audio_b64 = data.get("audio")
+            if audio_b64:
+                RESPONSE_WAV.parent.mkdir(parents=True, exist_ok=True)
+                RESPONSE_WAV.write_bytes(base64.b64decode(audio_b64))
+                play_wav(RESPONSE_WAV)
         else:
             print(f"[wakeword] Voice API error: {resp.status_code}", file=sys.stderr)
     except httpx.HTTPError as e:
