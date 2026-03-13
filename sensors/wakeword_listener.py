@@ -144,6 +144,33 @@ def main() -> None:
         print("[wakeword] Mic unavailable after retries, exiting", file=sys.stderr)
         sys.exit(1)
 
+    # Diagnostic: record 5s of audio at startup for offline analysis
+    diag_path = Path("/tmp/majel/diag_startup.wav")
+    diag_path.parent.mkdir(parents=True, exist_ok=True)
+    print("[wakeword] Recording 5s diagnostic audio...")
+    diag_frames = []
+    diag_start = time.monotonic()
+    while time.monotonic() - diag_start < 5:
+        length, data = mic.read()
+        if length > 0:
+            diag_frames.append(data)
+            audio = np.frombuffer(data, dtype=np.int16)
+            energy = float(np.sqrt(np.mean(audio.astype(np.float64) ** 2)))
+            pred = model.predict(audio)
+            scores = {k: pred[k] for k in model_names}
+            elapsed = time.monotonic() - diag_start
+            print(
+                f"[diag] t={elapsed:.1f}s energy={energy:.0f}"
+                f" min={audio.min()} max={audio.max()}"
+                f" scores={scores}"
+            )
+    with wave.open(str(diag_path), "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(SAMPLE_RATE)
+        wf.writeframes(b"".join(diag_frames))
+    print(f"[wakeword] Diagnostic audio saved: {diag_path} ({len(diag_frames)} frames)")
+
     print(f"[wakeword] Listening on {AUDIO_DEVICE} (threshold={THRESHOLD})...")
 
     frame_count = 0
