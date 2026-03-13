@@ -1,7 +1,7 @@
 model_name: "hey_majel"
 
 target_phrase:
-  - "hey majel"
+  - "hey mayjell"
 
 custom_negative_phrases:
   - "hey michael"
@@ -11,11 +11,11 @@ custom_negative_phrases:
   - "hey marble"
   - "hey mattel"
   - "hey label"
-  - "majel"
+  - "mayjell"
   - "hey"
 
-n_samples: 50000
-n_samples_val: 5000
+n_samples: 100000
+n_samples_val: 10000
 tts_batch_size: 25
 augmentation_batch_size: 16
 augmentation_rounds: 1
@@ -42,7 +42,7 @@ batch_n_per_class:
   "positive": 50
 
 model_type: "dnn"
-layer_size: 32
+layer_size: 64
 
 steps: 50000
 max_negative_weight: 1500
