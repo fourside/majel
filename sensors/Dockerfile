@@ -25,9 +25,9 @@ RUN .venv/bin/python -c "import openwakeword; openwakeword.utils.download_models
 
 FROM python:3.12-slim
 
-# Runtime deps: ALSA libs for pyalsaaudio
+# Runtime deps: ALSA libs for pyalsaaudio + aplay for TTS playback
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      libasound2 \
+      libasound2 alsa-utils \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -35,9 +35,6 @@ spec:
               mountPath: /tmp/majel
             - name: snd
               mountPath: /dev/snd
-            - name: proc-asound
-              mountPath: /proc/asound
-              readOnly: true
             - name: backlight
               mountPath: /sys/class/backlight
           resources:
@@ -85,10 +82,6 @@ spec:
           hostPath:
             path: /dev/i2c-1
             type: CharDevice
-        - name: proc-asound
-          hostPath:
-            path: /proc/asound
-            type: Directory
         - name: backlight
           hostPath:
             path: /sys/class/backlight
