@@ -22,7 +22,7 @@ export async function speak(text: string): Promise<void> {
 
   const wav = await synthesize(text);
 
-  const tmpFile = "/tmp/majel_response.wav";
+  const tmpFile = "/tmp/majel/response.wav";
   await Deno.writeFile(tmpFile, wav);
 
   const elapsed = Math.round(performance.now() - start);

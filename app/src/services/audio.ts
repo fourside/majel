@@ -102,7 +102,7 @@ async function playAlsa(wavPath: string): Promise<void> {
 
 /** TTS 結果のバイト列をスピーカーで再生（aplay があれば ALSA、なければスキップ） */
 export function playResponse(audioBytes: Uint8Array): void {
-  const tmpFile = "/tmp/majel_response.wav";
+  const tmpFile = "/tmp/majel/response.wav";
   // Fire-and-forget: don't block the HTTP response
   Deno.writeFile(tmpFile, audioBytes)
     .then(() => playAlsa(tmpFile))
