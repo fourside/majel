@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 # ── Settings ──
 WAKEWORD_MODEL = Path("/app/models/hey_majel.onnx")
-THRESHOLD = 0.5
+THRESHOLD = 0.3
 SAMPLE_RATE = 16000
 FRAME_SIZE = 1280  # 80ms at 16kHz
 RECORD_SILENCE_TIMEOUT = 2.0  # seconds of silence to stop recording
