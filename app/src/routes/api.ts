@@ -8,6 +8,7 @@ import { synthesize } from "../services/tts.ts";
 import { playResponse, record } from "../services/audio.ts";
 import { getBrightness, setBrightness, setPower } from "../services/display.ts";
 import { suppressAutoBrightness } from "../services/auto-brightness.ts";
+import { removeKanji } from "../services/kana.ts";
 import { broadcast } from "./ws.ts";
 
 export const apiRoutes = new Hono();
@@ -76,12 +77,14 @@ apiRoutes.post("/voice", async (c) => {
       wavPath = await record({ duration: 5, output: "/tmp/majel_input.wav" });
     }
 
-    // 2. 文字起こし
+    // 2. 文字起こし → 漢字除去
     broadcast("status", { phase: "transcribing" });
-    const text = await transcribe(wavPath);
+    let text = await transcribe(wavPath);
     if (!text) {
       return c.json({ error: "No speech detected", transcription: "" }, 400);
     }
+
+    text = removeKanji(text);
 
     // 3. LLM 応答
     broadcast("status", { phase: "thinking", transcription: text });

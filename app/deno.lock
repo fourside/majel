@@ -9,6 +9,7 @@
     "jsr:@std/encoding@1": "1.0.10",
     "jsr:@std/internal@^1.0.12": "1.0.12",
     "npm:@anthropic-ai/sdk@*": "0.78.0",
+    "npm:@patdx/kuromoji@1": "1.0.4",
     "npm:openai@*": "4.104.0",
     "npm:openai@4": "4.104.0"
   },
@@ -42,6 +43,9 @@
     },
     "@babel/runtime@7.28.6": {
       "integrity": "sha512-05WQkdpL9COIMz4LjTxGpPNCdlpyimKppYNoJ5Di5EUObifl8t4tuLuUBBZEpoLYOmfvIWrsp9fCl0HoPRVTdA=="
+    },
+    "@patdx/kuromoji@1.0.4": {
+      "integrity": "sha512-RyDyFh33XLxbsANNnai2h9LyR8AS1NCkqbO8Ts836g8cCb9XPBHQgzFjkja6PSGH8SKMaPUISIft7l9NUkm2PQ=="
     },
     "@types/node-fetch@2.6.13": {
       "integrity": "sha512-QGpRVpzSaUs30JBSGPjOg4Uveu384erbHBoT1zeONvyCfwQxIkUshLAOqN/k9EjGviPRmWTTe6aH2qySWKTVSw==",
@@ -262,6 +266,7 @@
       "jsr:@std/assert@1",
       "jsr:@std/dotenv@0.225",
       "jsr:@std/encoding@1",
+      "npm:@patdx/kuromoji@1",
       "npm:openai@4"
     ]
   }
