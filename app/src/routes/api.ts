@@ -37,28 +37,6 @@ apiRoutes.get("/sensors", (c) => {
   return c.json(getSensorData());
 });
 
-/** テキストで質問 → テキスト応答 */
-apiRoutes.post("/ask", async (c) => {
-  const body = await c.req.json();
-  const message = body.message as string;
-  if (!message) {
-    return c.json({ error: "message is required" }, 400);
-  }
-
-  broadcast("status", { phase: "thinking" });
-  try {
-    const response = await chat(message);
-    return c.json({ response });
-  } catch (e) {
-    console.error("ask error:", e);
-    return c.json({
-      error: "うまく処理できませんでした。もう一度お願いします。",
-    }, 500);
-  } finally {
-    broadcast("status", { phase: "done" });
-  }
-});
-
 /** 音声で質問 → 音声応答の完全パイプライン
  *  - wakeword listener からの呼び出し: { wav_path: "/tmp/majel/wakeword_input.wav" }
  *  - ブラウザ / 手動: 従来どおり PowerShell 録音 */
