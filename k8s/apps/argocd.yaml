@@ -12,6 +12,12 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: argocd-notifications-secret
+      jsonPointers:
+        - /data
   syncPolicy:
     automated:
       selfHeal: true
