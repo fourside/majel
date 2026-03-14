@@ -2,7 +2,31 @@ import { type IpadicFeatures, TokenizerBuilder } from "@patdx/kuromoji";
 
 const KANJI_RE = /[\u4E00-\u9FFF]/;
 
-let tokenizer: { tokenize(text: string): IpadicFeatures[] } | null = null;
+type Tokenizer = { tokenize(text: string): IpadicFeatures[] };
+
+let tokenizer: Tokenizer | null = null;
+
+/** gzip圧縮されたデータを解凍する */
+export async function _decompressGzip(
+  compressed: Uint8Array,
+): Promise<ArrayBuffer> {
+  const ds = new DecompressionStream("gzip");
+  const writer = ds.writable.getWriter();
+  writer.write(compressed as unknown as BufferSource);
+  writer.close();
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of ds.readable) {
+    chunks.push(new Uint8Array(chunk));
+  }
+  const totalLength = chunks.reduce((s, c) => s + c.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const chunk of chunks) {
+    result.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return result.buffer;
+}
 
 /** 辞書をロードして Tokenizer を初期化（起動時に1回だけ呼ぶ） */
 export async function initTokenizer(): Promise<void> {
@@ -16,35 +40,20 @@ export async function initTokenizer(): Promise<void> {
       async loadArrayBuffer(url: string): Promise<ArrayBufferLike> {
         const filePath = new URL(url, dicDir);
         const compressed = await Deno.readFile(filePath);
-        const ds = new DecompressionStream("gzip");
-        const writer = ds.writable.getWriter();
-        writer.write(compressed);
-        writer.close();
-        const chunks: Uint8Array[] = [];
-        for await (const chunk of ds.readable) {
-          chunks.push(new Uint8Array(chunk));
-        }
-        const totalLength = chunks.reduce((s, c) => s + c.length, 0);
-        const result = new Uint8Array(totalLength);
-        let offset = 0;
-        for (const chunk of chunks) {
-          result.set(chunk, offset);
-          offset += chunk.length;
-        }
-        return result.buffer;
+        return _decompressGzip(compressed);
       },
     },
   }).build();
   console.log("Kuromoji tokenizer ready");
 }
 
-/** 漢字を含むトークンを読み（カタカナ）に置換する。カタカナ・ひらがな・英数字・記号はそのまま。 */
-export function removeKanji(text: string): string {
-  if (!tokenizer) {
-    console.warn("Tokenizer not initialized, returning original text");
-    return text;
-  }
-  const tokens = tokenizer.tokenize(text);
+/**
+ * 漢字を含むトークンを読み（カタカナ）に置換する。
+ * カタカナ・ひらがな・英数字・記号はそのまま。
+ */
+export function _replaceKanjiWithReading(
+  tokens: IpadicFeatures[],
+): string {
   return tokens
     .map((t) => {
       if (KANJI_RE.test(t.surface_form) && t.reading) {
@@ -53,4 +62,13 @@ export function removeKanji(text: string): string {
       return t.surface_form;
     })
     .join("");
+}
+
+/** tokenizer を使って漢字をカタカナ読みに変換する */
+export function removeKanji(text: string): string {
+  if (!tokenizer) {
+    console.warn("Tokenizer not initialized, returning original text");
+    return text;
+  }
+  return _replaceKanjiWithReading(tokenizer.tokenize(text));
 }
