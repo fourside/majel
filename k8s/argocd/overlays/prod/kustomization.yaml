@@ -11,3 +11,6 @@ patches:
   - path: patches/argocd-cmd-params-cm.yaml
   - path: patches/repo-server-ksops.yaml
   - path: patches/argocd-notifications-cm.yaml
+
+generators:
+  - secrets/notifications-secret-generator.yaml
