@@ -10,11 +10,6 @@ const responseEl = document.querySelector("majel-response");
 /** @type {import("./components/majel-status.js").MajelStatus} */
 const statusEl = document.querySelector("majel-status");
 const micButton = document.getElementById("mic-button");
-const inputToggle = document.getElementById("input-toggle");
-const inputPanel = document.getElementById("input-panel");
-const form = document.getElementById("ask-form");
-const input = document.getElementById("message");
-const submitButton = form.querySelector("button");
 
 // ── WebSocket ──
 let lastTranscription = "";
@@ -95,46 +90,3 @@ async function doVoice() {
 
 micButton.addEventListener("click", doVoice);
 
-// ── テキスト入力 ──
-async function doAsk(message) {
-  submitButton.disabled = true;
-  responseEl.showResponse(message, null);
-  statusEl.setStatus("thinking");
-
-  try {
-    const res = await fetch("/api/ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
-    });
-    displayApiResult(message, await res.json(), () => doAsk(message));
-  } catch {
-    responseEl.showError(message, MSG_CONNECTION_ERROR, () => doAsk(message));
-  } finally {
-    statusEl.setStatus("done");
-    submitButton.disabled = false;
-  }
-}
-
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const message = input.value.trim();
-  if (!message) return;
-  input.value = "";
-  doAsk(message);
-});
-
-// ── Dev mode toggle ──
-const devMode = new URLSearchParams(location.search).has("dev");
-
-if (devMode) {
-  inputToggle.style.display = "grid";
-  inputPanel.classList.add("visible");
-} else {
-  inputToggle.style.display = "none";
-}
-
-inputToggle.addEventListener("click", () => {
-  inputPanel.classList.toggle("visible");
-  if (inputPanel.classList.contains("visible")) input.focus();
-});
