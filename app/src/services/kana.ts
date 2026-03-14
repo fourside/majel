@@ -8,11 +8,11 @@ let tokenizer: Tokenizer | null = null;
 
 /** gzip圧縮されたデータを解凍する */
 export async function _decompressGzip(
-  compressed: Uint8Array,
+  compressed: Uint8Array<ArrayBuffer>,
 ): Promise<ArrayBuffer> {
   const ds = new DecompressionStream("gzip");
   const writer = ds.writable.getWriter();
-  writer.write(compressed as unknown as BufferSource);
+  writer.write(compressed);
   writer.close();
   const chunks: Uint8Array[] = [];
   for await (const chunk of ds.readable) {
