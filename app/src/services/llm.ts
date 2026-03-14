@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { config } from "../config.ts";
+import { removeKanji } from "./kana.ts";
 import { executeTool, toolDefinitions } from "../tools/definitions.ts";
 
 const SYSTEM_PROMPT =
@@ -11,7 +12,8 @@ Mostly Adequate Japanese Environment Listener の略です。
 - マークダウン記法、箇条書き、記号は使わない
 - 1応答は3文以内を目安にする
 - 数値やデータは読み上げやすい形で伝える
-- 天気や時刻を聞かれたらツールを使って正確な情報を返す`;
+- 天気や時刻を聞かれたらツールを使って正確な情報を返す
+- 漢字を使わないでください。カタカナとひらがなで応答してください`;
 
 type ChatMessage = OpenAI.Chat.Completions.ChatCompletionMessageParam;
 
@@ -57,7 +59,7 @@ export async function chat(userMessage: string): Promise<string> {
 
     // ツール呼び出しがなければ最終応答
     if (!message.tool_calls || message.tool_calls.length === 0) {
-      const assistantText = message.content ?? "";
+      const assistantText = removeKanji(message.content ?? "");
       conversationHistory.push({ role: "assistant", content: assistantText });
 
       const elapsed = Math.round(performance.now() - start);
