@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+remote="$1"
+url="$2"
+
+# Determine which directories have changes being pushed
+changed_files=""
+while read -r local_ref local_oid remote_ref remote_oid; do
+  if [ "$local_oid" = "0000000000000000000000000000000000000000" ]; then
+    continue  # branch deletion
+  fi
+  if [ "$remote_oid" = "0000000000000000000000000000000000000000" ]; then
+    # new branch — diff against merge-base with main
+    base=$(git merge-base HEAD origin/main 2>/dev/null || echo "$local_oid")
+    changed_files+=$'\n'"$(git diff --name-only "$base" "$local_oid")"
+  else
+    changed_files+=$'\n'"$(git diff --name-only "$remote_oid" "$local_oid")"
+  fi
+done
+
+has_app=false
+has_sensors=false
+
+while IFS= read -r f; do
+  case "$f" in
+    app/*) has_app=true ;;
+    sensors/*) has_sensors=true ;;
+  esac
+done <<< "$changed_files"
+
+exit_code=0
+
+if $has_app; then
+  echo "▶ Checking app..."
+  "$root/scripts/check-app.sh" || exit_code=1
+fi
+
+if $has_sensors; then
+  echo "▶ Checking sensors..."
+  "$root/scripts/check-sensors.sh" || exit_code=1
+fi
+
+if [ $exit_code -ne 0 ]; then
+  echo "❌ Pre-push checks failed"
+  exit 1
+fi
