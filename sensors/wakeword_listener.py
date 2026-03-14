@@ -26,6 +26,8 @@ FRAME_SIZE = 1280  # 80ms at 16kHz
 RECORD_SILENCE_TIMEOUT = 2.0  # seconds of silence to stop recording
 RECORD_MAX_DURATION = 10.0  # max recording duration in seconds
 VAD_ENERGY_THRESHOLD = 500  # RMS threshold for voice activity
+FOLLOWUP_TIMEOUT = 5.0  # seconds to wait for follow-up speech after response
+FOLLOWUP_MAX_TURNS = 5  # max follow-up turns before requiring wakeword again
 APP_URL = os.environ.get("APP_URL", "http://localhost:3000")
 WAV_OUTPUT = Path("/tmp/majel/wakeword_input.wav")
 AUDIO_DEVICE = os.environ.get("ALSA_CAPTURE_DEVICE", "plughw:3,0")
@@ -55,10 +57,18 @@ def rms(data: bytes) -> float:
     return float(np.sqrt(np.mean(samples.astype(np.float64) ** 2)))
 
 
-def record_utterance(mic: alsaaudio.PCM) -> Path:
-    """Record audio until silence is detected (VAD-based endpoint)."""
+def record_utterance(
+    mic: alsaaudio.PCM, initial_frame: bytes | None = None
+) -> Path:
+    """Record audio until silence is detected (VAD-based endpoint).
+
+    If initial_frame is provided, it is prepended to the recording so that
+    the first voiced frame (detected by the caller) is not lost.
+    """
     print("[wakeword] Recording utterance...")
-    frames = []
+    frames: list[bytes] = []
+    if initial_frame is not None:
+        frames.append(initial_frame)
     silence_start = None
     start_time = time.monotonic()
 
@@ -113,6 +123,38 @@ def play_wav(wav_path: Path) -> None:
         print(f"[wakeword] aplay error: {e.stderr.decode()}", file=sys.stderr)
     except FileNotFoundError:
         print("[wakeword] aplay not found, skipping playback", file=sys.stderr)
+
+
+def drain_mic_buffer(mic: alsaaudio.PCM, model: Model) -> None:
+    """Discard buffered audio and reset wakeword model."""
+    model.reset()
+    while True:
+        n, _ = mic.read()
+        if n <= 0:
+            break
+
+
+def wait_for_followup(mic: alsaaudio.PCM) -> bytes | None:
+    """Wait up to FOLLOWUP_TIMEOUT seconds for follow-up speech.
+
+    Returns the first voiced audio frame if speech is detected within the
+    timeout window, or None if no speech is detected.  The caller should
+    pass the returned frame to record_utterance() so that the beginning of
+    the utterance is not lost.
+    """
+    print(f"[wakeword] Waiting {FOLLOWUP_TIMEOUT}s for follow-up...")
+    deadline = time.monotonic() + FOLLOWUP_TIMEOUT
+
+    while time.monotonic() < deadline:
+        length, data = mic.read()
+        if length <= 0:
+            continue
+        if rms(data) >= VAD_ENERGY_THRESHOLD:
+            print("[wakeword] Follow-up speech detected!")
+            return data
+
+    print("[wakeword] No follow-up detected")
+    return None
 
 
 def trigger_voice_pipeline(wav_path: Path) -> None:
@@ -176,19 +218,19 @@ def main() -> None:
             if score > THRESHOLD:
                 print(f"[wakeword] Detected! (score={score:.3f})")
 
-                model.reset()
+                # Conversation loop: process initial utterance, then
+                # allow follow-up turns without requiring wakeword
+                first_frame: bytes | None = None
+                for turn in range(1 + FOLLOWUP_MAX_TURNS):
+                    wav_path = record_utterance(mic, initial_frame=first_frame)
+                    trigger_voice_pipeline(wav_path)
+                    drain_mic_buffer(mic, model)
 
-                wav_path = record_utterance(mic)
-
-                # Run synchronously — pauses wakeword detection during
-                # API call + audio playback to prevent echo re-trigger
-                trigger_voice_pipeline(wav_path)
-
-                # Drain mic buffer accumulated during pipeline execution
-                model.reset()
-                while True:
-                    n, _ = mic.read()
-                    if n <= 0:
+                    if turn >= FOLLOWUP_MAX_TURNS:
+                        print("[wakeword] Max follow-up turns reached")
+                        break
+                    first_frame = wait_for_followup(mic)
+                    if first_frame is None:
                         break
 
                 print("[wakeword] Resuming listening...")
