@@ -3,3 +3,4 @@ creation_rules:
     age: age1qsj5x5cm98dl8r74xp80guvay8kjp0gz5gypqfdjzd9w59kuk5pquhjgef
   - path_regex: k8s/argocd/overlays/prod/secrets/notifications-secret\.yaml$
     age: age1qsj5x5cm98dl8r74xp80guvay8kjp0gz5gypqfdjzd9w59kuk5pquhjgef
+    encrypted_regex: "^(data|stringData)$"
