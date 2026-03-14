@@ -10,3 +10,4 @@ patches:
   - path: patches/argocd-cm.yaml
   - path: patches/argocd-cmd-params-cm.yaml
   - path: patches/repo-server-ksops.yaml
+  - path: patches/argocd-notifications-cm.yaml
