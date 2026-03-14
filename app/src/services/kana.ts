@@ -15,8 +15,23 @@ export async function initTokenizer(): Promise<void> {
     loader: {
       async loadArrayBuffer(url: string): Promise<ArrayBufferLike> {
         const filePath = new URL(url, dicDir);
-        const data = await Deno.readFile(filePath);
-        return data.buffer;
+        const compressed = await Deno.readFile(filePath);
+        const ds = new DecompressionStream("gzip");
+        const writer = ds.writable.getWriter();
+        writer.write(compressed);
+        writer.close();
+        const chunks: Uint8Array[] = [];
+        for await (const chunk of ds.readable) {
+          chunks.push(new Uint8Array(chunk));
+        }
+        const totalLength = chunks.reduce((s, c) => s + c.length, 0);
+        const result = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const chunk of chunks) {
+          result.set(chunk, offset);
+          offset += chunk.length;
+        }
+        return result.buffer;
       },
     },
   }).build();
