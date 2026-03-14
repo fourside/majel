@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+data:
+  config.yaml: |
+    receivers:
+      kubeletstats:
+        collection_interval: 30s
+        auth_type: serviceAccount
+        endpoint: "https://${env:K8S_NODE_NAME}:10250"
+        insecure_skip_verify: true
+        metric_groups:
+          - node
+          - pod
+          - container
+
+      hostmetrics:
+        collection_interval: 30s
+        root_path: /hostfs
+        scrapers:
+          cpu:
+            metrics:
+              system.cpu.utilization:
+                enabled: true
+          memory:
+            metrics:
+              system.memory.utilization:
+                enabled: true
+          disk: {}
+          filesystem: {}
+          network: {}
+          load: {}
+
+    processors:
+      memory_limiter:
+        check_interval: 5s
+        limit_mib: 100
+        spike_limit_mib: 20
+
+      batch:
+        send_batch_size: 1024
+        timeout: 10s
+
+      resource:
+        attributes:
+          - key: k8s.cluster.name
+            value: "majel-rpi5"
+            action: upsert
+
+    exporters:
+      otlphttp:
+        endpoint: "${env:GRAFANA_OTLP_ENDPOINT}"
+        headers:
+          Authorization: "${env:GRAFANA_OTLP_AUTH}"
+
+    service:
+      pipelines:
+        metrics:
+          receivers: [kubeletstats, hostmetrics]
+          processors: [memory_limiter, batch, resource]
+          exporters: [otlphttp]

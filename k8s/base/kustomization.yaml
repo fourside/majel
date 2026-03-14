@@ -8,6 +8,11 @@ resources:
   - app-deployment.yaml
   - app-service.yaml
   - configmap.yaml
+  - otel-serviceaccount.yaml
+  - otel-clusterrole.yaml
+  - otel-clusterrolebinding.yaml
+  - otel-configmap.yaml
+  - otel-daemonset.yaml
 
 generators:
   - secret-generator.yaml
