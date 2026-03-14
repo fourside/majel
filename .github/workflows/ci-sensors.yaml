@@ -3,12 +3,24 @@ name: CI Sensors
 on:
   pull_request:
     branches: [main]
-    paths:
-      - "sensors/**"
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      sensors: ${{ steps.filter.outputs.sensors }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            sensors:
+              - 'sensors/**'
+
   sensors:
     name: Sensors (Python)
+    needs: changes
+    if: needs.changes.outputs.sensors == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
