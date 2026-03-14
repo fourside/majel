@@ -57,9 +57,7 @@ def rms(data: bytes) -> float:
     return float(np.sqrt(np.mean(samples.astype(np.float64) ** 2)))
 
 
-def record_utterance(
-    mic: alsaaudio.PCM, initial_frame: bytes | None = None
-) -> Path:
+def record_utterance(mic: alsaaudio.PCM, initial_frame: bytes | None = None) -> Path:
     """Record audio until silence is detected (VAD-based endpoint).
 
     If initial_frame is provided, it is prepended to the recording so that
