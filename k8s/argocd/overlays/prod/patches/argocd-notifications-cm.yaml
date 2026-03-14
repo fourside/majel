@@ -20,7 +20,7 @@ data:
               "title": "✅ {{.app.metadata.name}} deployed",
               "fields": [
                 { "title": "Sync Status", "value": "{{.app.status.sync.status}}", "short": true },
-                { "title": "Revision", "value": "{{.app.status.sync.revision | truncate 7 }}", "short": true }
+                { "title": "Revision", "value": "{{.app.status.sync.revision | substr 0 7 }}", "short": true }
               ]
             }]
           }
