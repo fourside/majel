@@ -15,4 +15,11 @@ app.route("/api", apiRoutes);
 app.route("/ws", wsRoute);
 
 // 静的ファイル配信
+app.use(
+  "/dist/*",
+  serveStatic({
+    root: "./dist",
+    rewriteRequestPath: (p) => p.replace(/^\/dist/, ""),
+  }),
+);
 app.use("/*", serveStatic({ root: "./static" }));

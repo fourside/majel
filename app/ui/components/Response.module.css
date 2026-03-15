@@ -1,0 +1,45 @@
+.response {
+  padding: 1.5rem var(--space-section);
+  overflow-y: auto;
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+}
+
+.user {
+  font-size: var(--font-body);
+  color: var(--color-user);
+}
+
+.user::before {
+  content: "\01F5E3 ";
+}
+
+.text {
+  font-size: 0.9rem;
+  color: var(--color-assistant);
+  line-height: 1.6;
+}
+
+.typing {
+  border-right: 2px solid var(--color-assistant);
+  animation: blinkCaret 0.7s step-end infinite;
+}
+
+.error {
+  font-size: var(--font-body);
+  color: var(--color-error-light);
+  background: rgba(244, 67, 54, 0.1);
+  border-left: 3px solid var(--color-error);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+@keyframes blinkCaret {
+  0%, 100% {
+    border-color: var(--color-assistant);
+  }
+  50% {
+    border-color: transparent;
+  }
+}

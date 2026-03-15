@@ -32,6 +32,9 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Build
+        run: deno task build
+
       - name: Format check
         run: deno fmt --check
 
@@ -39,4 +42,4 @@ jobs:
         run: deno lint
 
       - name: Test
-        run: deno test --allow-read --allow-env src/ static/lib/
+        run: deno test --allow-read --allow-env src/ static/lib/ ui/

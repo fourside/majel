@@ -6,38 +6,11 @@
   <title>MAJEL</title>
   <link rel="preload" href="/fonts/MOTHER PIXEL2.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="/fonts/PixelMplus12-Bold.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/global.css">
+  <link rel="stylesheet" href="/dist/bundle.css">
 </head>
 <body>
-  <div class="dashboard">
-    <!-- 時刻 + 天気 -->
-    <div class="top-bar">
-      <majel-clock></majel-clock>
-      <div class="weather">
-        <majel-weather></majel-weather>
-      </div>
-    </div>
-
-    <!-- 環境センサー -->
-    <div class="middle">
-      <majel-sensors></majel-sensors>
-    </div>
-
-    <!-- 直近の応答 -->
-    <majel-response class="response"></majel-response>
-
-    <!-- ステータスバー -->
-    <div class="status-bar">
-      <majel-status></majel-status>
-      <button class="mic-button" id="mic-button" title="音声入力">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-        </svg>
-      </button>
-    </div>
-  </div>
-
-  <script type="module" src="/app.js"></script>
+  <div class="dashboard"></div>
+  <script type="module" src="/dist/bundle.js"></script>
 </body>
 </html>
