@@ -7,8 +7,6 @@ resources:
   - namespace.yaml
   - app-deployment.yaml
   - app-service.yaml
-  - voicevox-deployment.yaml
-  - voicevox-service.yaml
   - configmap.yaml
   - otel-serviceaccount.yaml
   - otel-clusterrole.yaml

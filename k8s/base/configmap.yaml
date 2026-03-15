@@ -6,6 +6,4 @@ metadata:
 data:
   PORT: "3000"
   TZ: "Asia/Tokyo"
-  TTS_ENGINE: "voicevox"
-  VOICEVOX_URL: "http://voicevox:50021"
-  VOICEVOX_SPEAKER: "1"
+  TTS_ENGINE: "openai"
