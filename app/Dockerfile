@@ -1,3 +1,14 @@
+FROM --platform=$BUILDPLATFORM denoland/deno:2.7.4 AS builder
+
+WORKDIR /app
+
+COPY deno.json deno.lock ./
+RUN deno install
+
+COPY ui/ ui/
+COPY static/lib/ static/lib/
+RUN deno task build
+
 FROM denoland/deno:2.7.4
 
 WORKDIR /app
@@ -8,10 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends alsa-utils \
 COPY deno.json deno.lock ./
 RUN deno install
 
-COPY ui/ ui/
 COPY src/ src/
 COPY static/ static/
-RUN deno task build
+COPY --from=builder /app/dist/ dist/
 RUN deno cache src/main.ts
 
 USER deno
