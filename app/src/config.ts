@@ -1,5 +1,7 @@
 import "@std/dotenv/load";
 
+export type TtsEngine = "voicevox" | "openai";
+
 export const config = {
   /** OpenAI API キー */
   openaiApiKey: Deno.env.get("OPENAI_API_KEY") ?? "",
@@ -10,9 +12,16 @@ export const config = {
   /** LLM モデル */
   llmModel: "gpt-4o-mini",
 
-  /** TTS モデル・ボイス */
+  /** TTS エンジン */
+  ttsEngine: (Deno.env.get("TTS_ENGINE") ?? "voicevox") as TtsEngine,
+
+  /** OpenAI TTS モデル・ボイス */
   ttsModel: "tts-1",
   ttsVoice: "nova",
+
+  /** VOICEVOX 設定 */
+  voicevoxUrl: Deno.env.get("VOICEVOX_URL") ?? "http://voicevox:50021",
+  voicevoxSpeaker: parseInt(Deno.env.get("VOICEVOX_SPEAKER") ?? "1"),
 
   /** STT 言語 */
   sttLanguage: "ja",

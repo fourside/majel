@@ -41,38 +41,46 @@ apiRoutes.get("/sensors", (c) => {
  *  - wakeword listener からの呼び出し: { wav_path: "/tmp/majel/wakeword_input.wav" }
  *  - ブラウザ / 手動: 従来どおり PowerShell 録音 */
 apiRoutes.post("/voice", async (c) => {
+  const pipelineStart = performance.now();
   try {
     const body = await c.req.json().catch(() => ({}));
     const externalWav = body.wav_path as string | undefined;
 
     let wavPath: string;
     if (externalWav) {
-      // wakeword listener が録音済み WAV を送ってきた
       wavPath = externalWav;
     } else {
-      // 従来の録音フロー (WSL / 手動テスト用)
       broadcast("status", { phase: "listening" });
       wavPath = await record({ duration: 5, output: "/tmp/majel_input.wav" });
     }
 
     // 2. 文字起こし → 漢字除去
     broadcast("status", { phase: "transcribing" });
+    let t0 = performance.now();
     let text = await transcribe(wavPath);
     if (!text) {
       return c.json({ error: "No speech detected", transcription: "" }, 400);
     }
-
     text = removeKanji(text);
+    const transcribeMs = Math.round(performance.now() - t0);
 
     // 3. LLM 応答
     broadcast("status", { phase: "thinking", transcription: text });
+    t0 = performance.now();
     const response = await chat(text);
+    const chatMs = Math.round(performance.now() - t0);
 
     // 4. 音声合成 → 再生
     broadcast("status", { phase: "speaking", response });
+    t0 = performance.now();
     const audioBytes = await synthesize(response);
+    const synthesizeMs = Math.round(performance.now() - t0);
 
-    // RPi 上ならスピーカーで再生 (fire-and-forget)
+    const totalMs = Math.round(performance.now() - pipelineStart);
+    console.log(
+      `[voice] transcribe: ${transcribeMs}ms, chat: ${chatMs}ms, synthesize: ${synthesizeMs}ms, total: ${totalMs}ms`,
+    );
+
     playResponse(audioBytes);
 
     const audioBase64 = encodeBase64(audioBytes);
