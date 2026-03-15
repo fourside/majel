@@ -17,7 +17,7 @@ spec:
       containers:
         - name: voicevox
           image: voicevox/voicevox_engine:cpu-latest
-          args: ["python", "-m", "voicevox_engine", "--host", "0.0.0.0", "--cpu_num_threads", "4"]
+          args: ["/opt/voicevox_engine/run", "--host", "0.0.0.0", "--cpu_num_threads", "4"]
           ports:
             - containerPort: 50021
           resources:
