@@ -52,9 +52,9 @@ function token(
   return { surface_form, reading } as IpadicFeatures;
 }
 
-Deno.test("_replaceKanjiWithReading > kanji with reading → reading", () => {
+Deno.test("_replaceKanjiWithReading > kanji with reading → hiragana", () => {
   const tokens = [token("東京", "トウキョウ")];
-  assertEquals(_replaceKanjiWithReading(tokens), "トウキョウ");
+  assertEquals(_replaceKanjiWithReading(tokens), "とうきょう");
 });
 
 Deno.test("_replaceKanjiWithReading > hiragana unchanged", () => {
@@ -74,7 +74,7 @@ Deno.test("_replaceKanjiWithReading > mixed sentence", () => {
     token("晴れ", "ハレ"),
     token("です"),
   ];
-  assertEquals(_replaceKanjiWithReading(tokens), "トウキョウはハレです");
+  assertEquals(_replaceKanjiWithReading(tokens), "とうきょうははれです");
 });
 
 Deno.test("_replaceKanjiWithReading > kanji without reading → surface_form", () => {
@@ -96,5 +96,5 @@ Deno.test("_replaceKanjiWithReading > empty tokens", () => {
 Deno.test("removeKanji > integration with real tokenizer", async () => {
   await initTokenizer();
   const result = removeKanji("東京は晴れです");
-  assertEquals(result, "トウキョウはハレです");
+  assertEquals(result, "とうきょうははれです");
 });
