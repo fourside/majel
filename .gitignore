@@ -1,6 +1,7 @@
 .env
 *.wav
 PLAN*.md
+plan-*.md
 node_modules/
 app/dist/
 k8s/base/secret.yaml
