@@ -19,8 +19,7 @@ data:
               "color": "#18be52",
               "title": "✅ {{.app.metadata.name}} deployed",
               "fields": [
-                { "title": "Sync Status", "value": "{{.app.status.sync.status}}", "short": true },
-                { "title": "Revision", "value": "{{.app.status.sync.revision | substr 0 7 }}", "short": true }
+                { "title": "Revision", "value": "<https://github.com/fourside/majel/commit/{{.app.status.sync.revision}}|{{.app.status.sync.revision | substr 0 7 }}>", "short": true }
               ]
             }]
           }
