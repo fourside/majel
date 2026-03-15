@@ -1,0 +1,124 @@
+@font-face {
+  font-family: "MOTHER PIXEL";
+  src: url("/fonts/MOTHER PIXEL2.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "PixelMplus12";
+  src: url("/fonts/PixelMplus12-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: block;
+}
+
+:root {
+  --color-bg: #1a1a2e;
+  --color-bg-surface: #16213e;
+  --color-text: #e0e0e0;
+  --color-text-muted: #aaa;
+  --color-accent: #00d4ff;
+  --color-border: #333;
+  --color-success: #4caf50;
+  --color-warning: #fdd835;
+  --color-error: #f44336;
+  --color-error-light: #ef9a9a;
+  --color-user: #81d4fa;
+  --color-assistant: #c5e1a5;
+
+  --font-display: 2.2rem;
+  --font-data: 1.3rem;
+  --font-body: 0.8rem;
+  --font-small: 0.7rem;
+
+  --radius: 4px;
+  --radius-full: 50%;
+
+  --space-section: 1rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    "MOTHER PIXEL", "PixelMplus12", "Helvetica Neue", Arial, "Hiragino Sans",
+    sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  width: 800px;
+  height: 480px;
+  overflow: hidden;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(to bottom, #0a0a14 0%, #12122a 60%, #1a1a2e 100%);
+  opacity: 0.9;
+}
+
+body::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  z-index: 0;
+  background: linear-gradient(
+    to top,
+    rgba(26, 26, 46, 0.95) 0%,
+    transparent 100%
+  );
+}
+
+.dashboard {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 110px 100px 1fr 56px;
+}
+
+.top-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 0 var(--space-section);
+  border-bottom: 1px solid rgba(22, 33, 62, 0.6);
+}
+
+.weather {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.middle {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  padding: 0 var(--space-section);
+  border-bottom: 1px solid rgba(22, 33, 62, 0.6);
+}
+
+.status-bar {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 var(--space-section);
+  background: rgba(22, 33, 62, 0.85);
+  font-size: 0.75rem;
+}

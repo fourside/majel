@@ -8,8 +8,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends alsa-utils \
 COPY deno.json deno.lock ./
 RUN deno install
 
+COPY ui/ ui/
 COPY src/ src/
 COPY static/ static/
+RUN deno task build
 RUN deno cache src/main.ts
 
 USER deno

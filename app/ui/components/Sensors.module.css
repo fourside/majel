@@ -1,0 +1,51 @@
+.row {
+  display: grid;
+  grid-template-columns: repeat(3, auto) 1fr;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.item {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.icon {
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.value {
+  font-size: var(--font-data);
+  font-weight: 300;
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-size: 0.9rem;
+}
+
+.graph {
+  display: flex;
+  align-items: flex-end;
+  justify-self: end;
+  gap: 1px;
+  height: 30px;
+  max-width: 200px;
+  overflow: hidden;
+}
+
+.bar {
+  width: 3px;
+  background: var(--color-warning);
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  transition: height 0.3s ease;
+}
+
+.dim {
+  opacity: 0.15;
+}

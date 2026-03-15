@@ -5,23 +5,33 @@
     "@std/dotenv": "jsr:@std/dotenv@0.225",
     "@std/encoding": "jsr:@std/encoding@1",
     "openai": "npm:openai@^4",
-    "@patdx/kuromoji": "npm:@patdx/kuromoji@^1"
+    "@patdx/kuromoji": "npm:@patdx/kuromoji@^1",
+    "preact": "npm:preact@^10",
+    "preact/hooks": "npm:preact@^10/hooks",
+    "@preact/signals": "npm:@preact/signals@^2",
+    "esbuild": "npm:esbuild@^0.25"
   },
   "nodeModulesDir": "auto",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
+  },
   "fmt": {
-    "exclude": ["static/", "scripts/"]
+    "exclude": ["static/", "scripts/", "dist/"]
   },
   "lint": {
-    "exclude": ["static/", "scripts/"]
+    "exclude": ["static/", "scripts/", "dist/"]
   },
   "tasks": {
     "start": "deno run --allow-all src/main.ts",
+    "build": "deno run --allow-all ui/build.ts",
+    "dev": "deno run --allow-all ui/build.ts --watch",
     "record": "deno run --allow-run --allow-write --allow-read scripts/01_record.ts",
     "transcribe": "deno run --allow-read --allow-net --allow-env scripts/02_transcribe.ts",
     "chat": "deno run --allow-net --allow-env --allow-read scripts/03_chat.ts",
     "speak": "deno run --allow-read --allow-write --allow-run --allow-net --allow-env scripts/04_speak.ts",
     "pipeline": "deno run --allow-all scripts/05_pipeline.ts",
     "mock:sensors": "deno run --allow-write --allow-read scripts/mock_sensors.ts",
-    "test": "deno test --allow-read --allow-env src/ static/lib/"
+    "test": "deno test --allow-read --allow-env src/ static/lib/ ui/"
   }
 }

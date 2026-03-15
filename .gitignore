@@ -2,4 +2,5 @@
 *.wav
 PLAN*.md
 node_modules/
+app/dist/
 k8s/base/secret.yaml
