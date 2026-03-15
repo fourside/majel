@@ -78,9 +78,6 @@ export function handleWsMessage(raw: unknown): void {
     if (response) {
       responseText.value = response;
     }
-    if (phase === "done") {
-      lastTranscription.value = "";
-    }
   }
 }
 
