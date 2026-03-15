@@ -46,11 +46,11 @@ Deno.test("handleWsMessage > status with response updates responseText", () => {
   assertEquals(responseText.value, "world");
 });
 
-Deno.test("handleWsMessage > done phase clears lastTranscription", () => {
+Deno.test("handleWsMessage > done phase keeps lastTranscription", () => {
   setup();
   lastTranscription.value = "hello";
   handleWsMessage({ type: "status", data: { phase: "done" } });
-  assertEquals(lastTranscription.value, "");
+  assertEquals(lastTranscription.value, "hello");
   assertEquals(statusPhase.value, "done");
 });
 
