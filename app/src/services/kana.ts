@@ -47,8 +47,15 @@ export async function initTokenizer(): Promise<void> {
   console.log("Kuromoji tokenizer ready");
 }
 
+function katakanaToHiragana(str: string): string {
+  return str.replace(
+    /[\u30A1-\u30F6]/g,
+    (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60),
+  );
+}
+
 /**
- * 漢字を含むトークンを読み（カタカナ）に置換する。
+ * 漢字を含むトークンを読み（ひらがな）に置換する。
  * カタカナ・ひらがな・英数字・記号はそのまま。
  */
 export function _replaceKanjiWithReading(
@@ -57,7 +64,7 @@ export function _replaceKanjiWithReading(
   return tokens
     .map((t) => {
       if (KANJI_RE.test(t.surface_form) && t.reading) {
-        return t.reading;
+        return katakanaToHiragana(t.reading);
       }
       return t.surface_form;
     })
