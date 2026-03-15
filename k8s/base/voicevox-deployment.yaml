@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voicevox
+  namespace: majel
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: voicevox
+  template:
+    metadata:
+      labels:
+        app: voicevox
+    spec:
+      containers:
+        - name: voicevox
+          image: voicevox/voicevox_engine:cpu-latest
+          ports:
+            - containerPort: 50021
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          readinessProbe:
+            httpGet:
+              path: /speakers
+              port: 50021
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /speakers
+              port: 50021
+            initialDelaySeconds: 60
+            periodSeconds: 30

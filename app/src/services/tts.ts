@@ -4,8 +4,37 @@ import { playAudio } from "./audio.ts";
 
 const client = new OpenAI();
 
-/** OpenAI TTS API でテキストを音声合成し WAV バイト列を返す */
-export async function synthesize(text: string): Promise<Uint8Array> {
+/** VOICEVOX ENGINE で音声合成し WAV バイト列を返す */
+async function synthesizeVoicevox(text: string): Promise<Uint8Array> {
+  const { voicevoxUrl, voicevoxSpeaker } = config;
+
+  const queryRes = await fetch(
+    `${voicevoxUrl}/audio_query?text=${
+      encodeURIComponent(text)
+    }&speaker=${voicevoxSpeaker}`,
+    { method: "POST" },
+  );
+  if (!queryRes.ok) {
+    throw new Error(`VOICEVOX audio_query failed: ${queryRes.status}`);
+  }
+  const query = await queryRes.json();
+
+  const synthRes = await fetch(
+    `${voicevoxUrl}/synthesis?speaker=${voicevoxSpeaker}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(query),
+    },
+  );
+  if (!synthRes.ok) {
+    throw new Error(`VOICEVOX synthesis failed: ${synthRes.status}`);
+  }
+  return new Uint8Array(await synthRes.arrayBuffer());
+}
+
+/** OpenAI TTS API で音声合成し WAV バイト列を返す */
+async function synthesizeOpenAI(text: string): Promise<Uint8Array> {
   const response = await client.audio.speech.create({
     model: config.ttsModel,
     voice: config.ttsVoice,
@@ -13,6 +42,19 @@ export async function synthesize(text: string): Promise<Uint8Array> {
     response_format: "wav",
   });
   return new Uint8Array(await response.arrayBuffer());
+}
+
+/** テキストを音声合成し WAV バイト列を返す。VOICEVOX 失敗時は OpenAI にフォールバック */
+export async function synthesize(text: string): Promise<Uint8Array> {
+  if (config.ttsEngine === "voicevox") {
+    try {
+      return await synthesizeVoicevox(text);
+    } catch (e) {
+      console.warn(`[tts] VOICEVOX failed, falling back to OpenAI:`, e);
+      return await synthesizeOpenAI(text);
+    }
+  }
+  return await synthesizeOpenAI(text);
 }
 
 /** テキストを音声合成して再生する */
