@@ -10,7 +10,7 @@ export const config = {
   port: parseInt(Deno.env.get("PORT") ?? "3000"),
 
   /** LLM モデル */
-  llmModel: "gpt-4o-mini",
+  llmModel: "gpt-5.4-nano",
 
   /** TTS エンジン */
   ttsEngine: (Deno.env.get("TTS_ENGINE") ?? "voicevox") as TtsEngine,
