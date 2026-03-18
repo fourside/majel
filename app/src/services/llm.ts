@@ -50,7 +50,7 @@ export async function chat(userMessage: string): Promise<string> {
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
     const completion = await getClient().chat.completions.create({
       model: config.llmModel,
-      max_tokens: 512,
+      max_completion_tokens: 512,
       messages,
       tools: toolDefinitions,
     });
