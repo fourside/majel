@@ -49,12 +49,7 @@ spec:
               memory: "512Mi"
               cpu: "500m"
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 1993
-            readOnlyRootFilesystem: true
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["ALL"]
+            privileged: true
 
         - name: sensors
           image: ghcr.io/fourside/majel-sensors:latest
