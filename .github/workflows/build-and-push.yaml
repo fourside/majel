@@ -6,11 +6,13 @@ on:
     paths:
       - "app/**"
       - "sensors/**"
+      - "recorder/**"
 
 env:
   REGISTRY: ghcr.io
   APP_IMAGE: ghcr.io/fourside/majel-app
   SENSORS_IMAGE: ghcr.io/fourside/majel-sensors
+  RECORDER_IMAGE: ghcr.io/fourside/majel-recorder
 
 jobs:
   build:
@@ -56,6 +58,18 @@ jobs:
           tags: |
             ${{ env.SENSORS_IMAGE }}:${{ github.sha }}
             ${{ env.SENSORS_IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push recorder
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: ./recorder
+          platforms: linux/arm64
+          push: true
+          tags: |
+            ${{ env.RECORDER_IMAGE }}:${{ github.sha }}
+            ${{ env.RECORDER_IMAGE }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
