@@ -35,10 +35,6 @@ spec:
               mountPath: /tmp/majel
             - name: snd
               mountPath: /dev/snd
-            - name: alsa-conf
-              mountPath: /etc/asound.conf
-              subPath: asound.conf
-              readOnly: true
             - name: backlight
               mountPath: /sys/class/backlight
           resources:
@@ -81,9 +77,6 @@ spec:
           hostPath:
             path: /dev/i2c-1
             type: CharDevice
-        - name: alsa-conf
-          configMap:
-            name: majel-alsa-conf
         - name: backlight
           hostPath:
             path: /sys/class/backlight
