@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: majel-news-record-noon
+  namespace: majel
+spec:
+  schedule: "0 12 * * 1-5"
+  timeZone: "Asia/Tokyo"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 1200
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: recorder
+              image: ghcr.io/fourside/majel-recorder:latest
+              args: ["noon"]
+              env:
+                - name: OUTPUT_DIR
+                  value: /data/news
+              volumeMounts:
+                - name: news-data
+                  mountPath: /data/news
+          volumes:
+            - name: news-data
+              hostPath:
+                path: /home/fourside/majel/data/news
+                type: DirectoryOrCreate

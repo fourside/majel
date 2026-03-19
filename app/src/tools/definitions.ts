@@ -3,6 +3,8 @@ import { getWeather } from "../services/weather.ts";
 import { getSensorData } from "../services/sensors.ts";
 import { setBrightness, setPower } from "../services/display.ts";
 import { suppressAutoBrightness } from "../services/auto-brightness.ts";
+import { resolveNewsFile } from "../services/news.ts";
+import * as audioPlayer from "../services/audio-player.ts";
 
 /** GPT-4o-mini function calling 用ツール定義 */
 export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
@@ -91,6 +93,49 @@ export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "play_news",
+      description: "最新のNHKラジオニュースを再生する",
+      parameters: {
+        type: "object",
+        properties: {
+          period: {
+            type: "string",
+            enum: ["morning", "noon", "latest"],
+            description: "朝のニュース、昼のニュース、または最新のニュース",
+          },
+        },
+        required: [],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "stop_audio",
+      description: "再生中のオーディオを停止する",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "pause_audio",
+      description:
+        "再生中のオーディオを一時停止する。既に一時停止中なら再開する。",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+  },
 ];
 
 /** ツール呼び出しを実行して結果を返す */
@@ -147,6 +192,46 @@ export async function executeTool(
       const on = args.on as boolean;
       await setPower(on);
       return JSON.stringify({ ok: true, power: on });
+    }
+    case "play_news": {
+      const period = (args.period as string | undefined) ?? "latest";
+      const news = await resolveNewsFile(
+        period as "morning" | "noon" | "latest",
+      );
+      if (!news) {
+        return JSON.stringify({
+          result:
+            "ニュースの録音がまだありません。録音が完了するまでお待ちください。",
+        });
+      }
+      await audioPlayer.play(news.path, news.label);
+      const label = period === "morning"
+        ? "朝"
+        : period === "noon"
+        ? "昼"
+        : "最新";
+      return JSON.stringify({ result: `${label}のニュースを再生します。` });
+    }
+    case "stop_audio": {
+      if (audioPlayer.getPlaybackState() === "idle") {
+        return JSON.stringify({ result: "現在、何も再生していません。" });
+      }
+      await audioPlayer.stop();
+      return JSON.stringify({ result: "再生を停止しました。" });
+    }
+    case "pause_audio": {
+      const state = audioPlayer.getPlaybackState();
+      if (state === "playing") {
+        await audioPlayer.pause();
+        return JSON.stringify({
+          result: "一時停止しました。「再開して」で続きを再生します。",
+        });
+      }
+      if (state === "paused") {
+        await audioPlayer.resume();
+        return JSON.stringify({ result: "再生を再開します。" });
+      }
+      return JSON.stringify({ result: "現在、何も再生していません。" });
     }
     default:
       return JSON.stringify({ error: `Unknown tool: ${name}` });

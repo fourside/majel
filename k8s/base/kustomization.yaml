@@ -8,7 +8,6 @@ resources:
   - app-deployment.yaml
   - app-service.yaml
   - configmap.yaml
-  - alsa-conf.yaml
   - otel-serviceaccount.yaml
   - otel-clusterrole.yaml
   - otel-clusterrolebinding.yaml

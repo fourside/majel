@@ -3,9 +3,12 @@ kind: Kustomization
 
 resources:
   - ../../base
+  - ../../majel-news-record
 
 images:
   - name: ghcr.io/fourside/majel-app
     newTag: "63c74de147497da6bde72d3173de35d678c36a53"
   - name: ghcr.io/fourside/majel-sensors
     newTag: "63c74de147497da6bde72d3173de35d678c36a53"
+  - name: ghcr.io/fourside/majel-recorder
+    newTag: "latest"
