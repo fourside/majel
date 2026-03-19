@@ -37,6 +37,9 @@ spec:
               mountPath: /dev/snd
             - name: backlight
               mountPath: /sys/class/backlight
+            - name: news-data
+              mountPath: /data/news
+              readOnly: true
           resources:
             requests:
               memory: "128Mi"
@@ -81,3 +84,7 @@ spec:
           hostPath:
             path: /sys/class/backlight
             type: Directory
+        - name: news-data
+          hostPath:
+            path: /home/fourside/majel/data/news
+            type: DirectoryOrCreate

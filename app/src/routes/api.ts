@@ -6,6 +6,7 @@ import { chat, clearHistory } from "../services/llm.ts";
 import { transcribe } from "../services/stt.ts";
 import { synthesize } from "../services/tts.ts";
 import { playResponse, record } from "../services/audio.ts";
+import * as audioPlayer from "../services/audio-player.ts";
 import { getBrightness, setBrightness, setPower } from "../services/display.ts";
 import { suppressAutoBrightness } from "../services/auto-brightness.ts";
 import { removeKanji } from "../services/kana.ts";
@@ -127,6 +128,32 @@ apiRoutes.post("/display/power", async (c) => {
 apiRoutes.get("/display/status", async (c) => {
   const brightness = await getBrightness();
   return c.json({ brightness });
+});
+
+/** オーディオ再生停止（UIからのフォールバック用） */
+apiRoutes.post("/audio/stop", async (c) => {
+  await audioPlayer.stop();
+  return c.json({ ok: true });
+});
+
+/** オーディオ再生状態取得 */
+apiRoutes.get("/audio/status", (c) => {
+  return c.json({
+    state: audioPlayer.getPlaybackState(),
+    label: audioPlayer.getPlaybackLabel(),
+  });
+});
+
+/** オーディオ音量ダッキング（wakeword検出時用） */
+apiRoutes.post("/audio/duck", async (c) => {
+  await audioPlayer.duck();
+  return c.json({ ok: true });
+});
+
+/** オーディオ音量ダッキング解除 */
+apiRoutes.post("/audio/unduck", async (c) => {
+  await audioPlayer.unduck();
+  return c.json({ ok: true });
 });
 
 /** 会話履歴クリア */
