@@ -6,29 +6,8 @@ export function Clock() {
   const prevRef = useRef(["", "", "", ""]);
 
   useEffect(() => {
-    function update() {
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2, "0");
-      const m = String(now.getMinutes()).padStart(2, "0");
-      const values = [h[0], h[1], m[0], m[1]];
-
-      for (let i = 0; i < 4; i++) {
-        if (values[i] === prevRef.current[i]) continue;
-        const el = digitsRef.current[i];
-        if (!el) continue;
-        el.textContent = values[i];
-        el.classList.add(styles.flip);
-        el.addEventListener(
-          "animationend",
-          () => el.classList.remove(styles.flip),
-          { once: true },
-        );
-      }
-      prevRef.current = values;
-    }
-
-    update();
-    const timer = setInterval(update, 1000);
+    updateDigits(digitsRef, prevRef);
+    const timer = setInterval(() => updateDigits(digitsRef, prevRef), 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -61,4 +40,35 @@ export function Clock() {
       />
     </div>
   );
+}
+
+function getTimeDigits(): [string, string, string, string] {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, "0");
+  const m = String(now.getMinutes()).padStart(2, "0");
+  return [h[0], h[1], m[0], m[1]];
+}
+
+function flipDigit(el: HTMLSpanElement, value: string): void {
+  el.textContent = value;
+  el.classList.add(styles.flip);
+  el.addEventListener(
+    "animationend",
+    () => el.classList.remove(styles.flip),
+    { once: true },
+  );
+}
+
+function updateDigits(
+  digitsRef: preact.RefObject<(HTMLSpanElement | null)[]>,
+  prevRef: preact.RefObject<string[]>,
+): void {
+  const values = getTimeDigits();
+  for (let i = 0; i < 4; i++) {
+    if (values[i] === prevRef.current![i]) continue;
+    const el = digitsRef.current![i];
+    if (!el) continue;
+    flipDigit(el, values[i]);
+  }
+  prevRef.current = values;
 }

@@ -3,6 +3,17 @@ import styles from "./HourlyAnnounce.module.css";
 
 const DISPLAY_DURATION = 15_000;
 
+export function HourlyAnnounce() {
+  const { visible, date, time } = useHourlyAnnounce();
+
+  return (
+    <div class={`${styles.overlay} ${visible ? styles.visible : ""}`}>
+      <div class={styles.date}>{date}</div>
+      <div class={styles.time}>{time}</div>
+    </div>
+  );
+}
+
 const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 function formatDate(d: Date): string {
@@ -18,7 +29,13 @@ function formatTime(d: Date): string {
   return `${h}:${m}`;
 }
 
-export function HourlyAnnounce() {
+interface HourlyAnnounceState {
+  visible: boolean;
+  date: string;
+  time: string;
+}
+
+function useHourlyAnnounce(): HourlyAnnounceState {
   const [visible, setVisible] = useState(false);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -47,10 +64,5 @@ export function HourlyAnnounce() {
     };
   }, []);
 
-  return (
-    <div class={`${styles.overlay} ${visible ? styles.visible : ""}`}>
-      <div class={styles.date}>{date}</div>
-      <div class={styles.time}>{time}</div>
-    </div>
-  );
+  return { visible, date, time };
 }

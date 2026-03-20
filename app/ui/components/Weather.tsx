@@ -23,17 +23,11 @@ export function Weather() {
   }, []);
 
   useEffect(() => {
-    async function fetchWeather() {
-      try {
-        const res = await fetch("/api/weather");
-        if (!res.ok) throw new Error(String(res.status));
-        setWeather(await res.json());
-      } catch {
-        setWeather(null);
-      }
-    }
-    fetchWeather();
-    const timer = setInterval(fetchWeather, 10 * 60_000);
+    fetchWeather().then(setWeather);
+    const timer = setInterval(
+      () => fetchWeather().then(setWeather),
+      10 * 60_000,
+    );
     return () => clearInterval(timer);
   }, []);
 
@@ -60,4 +54,14 @@ export function Weather() {
 
 function formatDate(d: Date): string {
   return `${d.getMonth() + 1} / ${d.getDate()} ${WEEKDAYS[d.getDay()]}`;
+}
+
+async function fetchWeather(): Promise<WeatherData | null> {
+  try {
+    const res = await fetch("/api/weather");
+    if (!res.ok) throw new Error(String(res.status));
+    return await res.json();
+  } catch {
+    return null;
+  }
 }

@@ -17,6 +17,21 @@ export function Response() {
 }
 
 function Typewriter({ text }: { text: string }) {
+  const { displayed, done } = useTypewriter(text);
+
+  return (
+    <div class={`${styles.text}${done ? "" : ` ${styles.typing}`}`}>
+      {displayed}
+    </div>
+  );
+}
+
+interface TypewriterState {
+  displayed: string;
+  done: boolean;
+}
+
+function useTypewriter(text: string): TypewriterState {
   const [charIndex, setCharIndex] = useState(0);
   const timerRef = useRef<number | null>(null);
   const prevTextRef = useRef(text);
@@ -43,11 +58,8 @@ function Typewriter({ text }: { text: string }) {
     };
   }, [text]);
 
-  const done = charIndex >= text.length;
-
-  return (
-    <div class={`${styles.text}${done ? "" : ` ${styles.typing}`}`}>
-      {text.slice(0, charIndex)}
-    </div>
-  );
+  return {
+    displayed: text.slice(0, charIndex),
+    done: charIndex >= text.length,
+  };
 }
