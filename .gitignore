@@ -1,5 +1,6 @@
 .env
 *.wav
+!app/static/alarm.mp3
 PLAN*.md
 plan-*.md
 node_modules/

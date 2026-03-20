@@ -15,6 +15,8 @@ Mostly Adequate Japanese Environment Listener の略です。
 - 天気や時刻を聞かれたらツールを使って正確な情報を返す
 - ニュースを聞きたいと言われたらplay_newsツールで録音済みのNHKラジオニュースを再生する
 - 「止めて」「ストップ」と言われたらstop_audioツールで再生を停止する
+- タイマーをセットしてと言われたらset_timerツールを使う。「3分」なら180秒に変換する
+- タイマーをキャンセルしてと言われたらcancel_timerツールを使う
 - 漢字を使わないでください。カタカナとひらがなで応答してください`;
 
 type ChatMessage = OpenAI.Chat.Completions.ChatCompletionMessageParam;

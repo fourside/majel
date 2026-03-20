@@ -22,6 +22,13 @@ export const lastTranscription = signal("");
 export const responseText = signal<string | null>(null);
 export const responseError = signal<string | null>(null);
 
+export interface TimerData {
+  active: boolean;
+  label: string;
+  remainingSec: number | null;
+}
+export const timerData = signal<TimerData | null>(null);
+
 export function resetSignals(): void {
   statusPhase.value = "done";
   isDisconnected.value = false;
@@ -29,4 +36,5 @@ export function resetSignals(): void {
   lastTranscription.value = "";
   responseText.value = null;
   responseError.value = null;
+  timerData.value = null;
 }

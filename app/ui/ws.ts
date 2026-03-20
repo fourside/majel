@@ -7,6 +7,8 @@ import {
   type SensorData,
   sensorData,
   statusPhase,
+  type TimerData,
+  timerData,
 } from "./signals.ts";
 
 // ── Message types ──
@@ -25,7 +27,12 @@ interface StatusMessage {
   };
 }
 
-type WsMessage = SensorsMessage | StatusMessage;
+interface TimerMessage {
+  type: "timer";
+  data: TimerData;
+}
+
+type WsMessage = SensorsMessage | StatusMessage | TimerMessage;
 
 // ── Type guards ──
 
@@ -55,6 +62,9 @@ function isWsMessage(raw: unknown): raw is WsMessage {
     if (!isRecord(raw.data)) return false;
     return isPhase(raw.data.phase);
   }
+  if (raw.type === "timer") {
+    return isRecord(raw.data) && typeof raw.data.active === "boolean";
+  }
   return false;
 }
 
@@ -66,6 +76,8 @@ export function handleWsMessage(raw: unknown): void {
 
   if (raw.type === "sensors") {
     sensorData.value = raw.data;
+  } else if (raw.type === "timer") {
+    timerData.value = raw.data;
   } else {
     const { phase, transcription, response } = raw.data;
     statusPhase.value = phase;
