@@ -4,6 +4,7 @@ import { Clock } from "./components/Clock.tsx";
 import { Weather } from "./components/Weather.tsx";
 import { Sensors } from "./components/Sensors.tsx";
 import { Response } from "./components/Response.tsx";
+import { Timer } from "./components/Timer.tsx";
 import { Status } from "./components/Status.tsx";
 
 const WS_RETRY_MAX = 60000;
@@ -69,6 +70,7 @@ export function App() {
       <div class="middle">
         <Sensors />
       </div>
+      <Timer />
       <Response />
       <div class="status-bar">
         <Status />
