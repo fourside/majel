@@ -1,6 +1,6 @@
 import * as audioPlayer from "./audio-player.ts";
 
-const ALARM_FILE = new URL("../../static/alarm.wav", import.meta.url).pathname;
+const ALARM_FILE = new URL("../../static/alarm.mp3", import.meta.url).pathname;
 
 let timerId: number | null = null;
 let timerLabel = "";
