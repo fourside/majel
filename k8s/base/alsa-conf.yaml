@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: majel-alsa-conf
+  namespace: majel
+data:
+  asound.conf: |
+    pcm.softvol {
+      type softvol
+      slave.pcm "plughw:2,0"
+      control {
+        name "SoftVolume"
+        card 2
+      }
+      min_dB -30.0
+      max_dB 0.0
+    }

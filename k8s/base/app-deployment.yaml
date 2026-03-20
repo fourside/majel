@@ -37,6 +37,10 @@ spec:
               mountPath: /dev/snd
             - name: backlight
               mountPath: /sys/class/backlight
+            - name: alsa-conf
+              mountPath: /etc/asound.conf
+              subPath: asound.conf
+              readOnly: true
             - name: news-data
               mountPath: /data/news
               readOnly: true
@@ -59,6 +63,10 @@ spec:
               mountPath: /dev/i2c-1
             - name: snd
               mountPath: /dev/snd
+            - name: alsa-conf
+              mountPath: /etc/asound.conf
+              subPath: asound.conf
+              readOnly: true
           resources:
             requests:
               memory: "128Mi"
@@ -84,6 +92,9 @@ spec:
           hostPath:
             path: /sys/class/backlight
             type: Directory
+        - name: alsa-conf
+          configMap:
+            name: majel-alsa-conf
         - name: news-data
           hostPath:
             path: /home/fourside/majel/data/news
