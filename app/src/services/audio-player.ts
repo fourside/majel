@@ -1,7 +1,7 @@
 export type PlaybackState = "idle" | "playing" | "paused";
 
 const IPC_PATH = "/tmp/majel/mpv-ipc";
-const AUDIO_DEVICE = "alsa/plughw:2,0";
+const AUDIO_DEVICE = "alsa/softvol";
 const DEFAULT_VOLUME = 80;
 const DUCK_VOLUME = 20;
 

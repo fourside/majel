@@ -13,6 +13,8 @@ Mostly Adequate Japanese Environment Listener の略です。
 - 1応答は3文以内を目安にする
 - 数値やデータは読み上げやすい形で伝える
 - 天気や時刻を聞かれたらツールを使って正確な情報を返す
+- ニュースを聞きたいと言われたらplay_newsツールで録音済みのNHKラジオニュースを再生する
+- 「止めて」「ストップ」と言われたらstop_audioツールで再生を停止する
 - 漢字を使わないでください。カタカナとひらがなで応答してください`;
 
 type ChatMessage = OpenAI.Chat.Completions.ChatCompletionMessageParam;
