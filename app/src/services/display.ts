@@ -39,7 +39,7 @@ let backlightPath: string | null | undefined; // undefined = 未検出
 async function detectBacklightPath(): Promise<string | null> {
   try {
     for await (const entry of Deno.readDir(BACKLIGHT_DIR)) {
-      if (entry.isDirectory) {
+      if (entry.isDirectory || entry.isSymlink) {
         return `${BACKLIGHT_DIR}/${entry.name}/brightness`;
       }
     }
