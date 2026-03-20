@@ -5,6 +5,7 @@ import { setBrightness, setPower } from "../services/display.ts";
 import { suppressAutoBrightness } from "../services/auto-brightness.ts";
 import { resolveNewsFile } from "../services/news.ts";
 import * as audioPlayer from "../services/audio-player.ts";
+import { cancelTimer, setTimer } from "../services/timer.ts";
 
 /** GPT-4o-mini function calling 用ツール定義 */
 export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
@@ -136,6 +137,40 @@ export const toolDefinitions: OpenAI.Chat.Completions.ChatCompletionTool[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "set_timer",
+      description:
+        "指定した秒数のタイマーをセットする。時間が来たらアラーム音を鳴らす。",
+      parameters: {
+        type: "object",
+        properties: {
+          duration_sec: {
+            type: "number",
+            description: "タイマーの秒数",
+          },
+          label: {
+            type: "string",
+            description: "タイマーのラベル（例: パスタ、卵）",
+          },
+        },
+        required: ["duration_sec"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "cancel_timer",
+      description: "セット中のタイマーをキャンセルする。",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+  },
 ];
 
 /** ツール呼び出しを実行して結果を返す */
@@ -232,6 +267,29 @@ export async function executeTool(
         return JSON.stringify({ result: "再生を再開します。" });
       }
       return JSON.stringify({ result: "現在、何も再生していません。" });
+    }
+    case "set_timer": {
+      const durationSec = args.duration_sec as number;
+      const label = (args.label as string | undefined) ?? "タイマー";
+      const result = setTimer(durationSec, label);
+      if (!result.ok) {
+        return JSON.stringify({ result: result.reason });
+      }
+      const min = Math.floor(durationSec / 60);
+      const sec = durationSec % 60;
+      const timeStr = min > 0
+        ? sec > 0 ? `${min}分${sec}秒` : `${min}分`
+        : `${sec}秒`;
+      return JSON.stringify({
+        result: `${label}のタイマーを${timeStr}にセットしました。`,
+      });
+    }
+    case "cancel_timer": {
+      const result = cancelTimer();
+      if (!result.ok) {
+        return JSON.stringify({ result: result.reason });
+      }
+      return JSON.stringify({ result: "タイマーをキャンセルしました。" });
     }
     default:
       return JSON.stringify({ error: `Unknown tool: ${name}` });
