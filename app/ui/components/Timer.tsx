@@ -1,14 +1,11 @@
-import { timerData } from "../signals.ts";
+import { type TimerData, timerData } from "../signals.ts";
 import styles from "./Timer.module.css";
 
-function formatTime(sec: number): string {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+export function Timer() {
+  return <TimerView timer={timerData.value} />;
 }
 
-export function Timer() {
-  const timer = timerData.value;
+export function TimerView({ timer }: { timer: TimerData | null }) {
   if (!timer?.active || timer.remainingSec === null) return null;
 
   return (
@@ -17,4 +14,10 @@ export function Timer() {
       <span class={styles.label}>{timer.label}</span>
     </div>
   );
+}
+
+function formatTime(sec: number): string {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }

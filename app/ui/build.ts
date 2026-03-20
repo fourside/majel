@@ -2,14 +2,19 @@ import * as esbuild from "esbuild";
 
 const isWatch = Deno.args.includes("--watch");
 
+const entryPoints = ["./ui/main.tsx"];
+if (isWatch) {
+  entryPoints.push("./ui/catalog.tsx");
+}
+
 const config: esbuild.BuildOptions = {
-  entryPoints: ["./ui/main.tsx"],
+  entryPoints,
   bundle: true,
   outdir: "./dist",
   format: "esm",
   jsx: "automatic",
   jsxImportSource: "preact",
-  entryNames: "bundle",
+  entryNames: "[name]",
 };
 
 if (isWatch) {

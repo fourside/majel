@@ -5,7 +5,7 @@ import styles from "./Weather.module.css";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-interface WeatherData {
+export interface WeatherData {
   weatherCode: number;
   temperature: number;
 }
@@ -31,6 +31,12 @@ export function Weather() {
     return () => clearInterval(timer);
   }, []);
 
+  return <WeatherView date={date} weather={weather} />;
+}
+
+export function WeatherView(
+  { date, weather }: { date: string; weather: WeatherData | null },
+) {
   const iconSrc = weather ? wmoCodeToIcon(weather.weatherCode) : "";
   const iconAlt = weather ? `weather-${weather.weatherCode}` : "--";
   const temp = weather ? formatTemperature(weather.temperature) : "--°C";

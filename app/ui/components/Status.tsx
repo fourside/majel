@@ -1,13 +1,21 @@
 import { useEffect, useState } from "preact/hooks";
 // @ts-types="../../static/lib/status.js"
 import { phaseToLabel } from "../../static/lib/status.js";
-import { isDisconnected, statusPhase } from "../signals.ts";
+import { isDisconnected, type Phase, statusPhase } from "../signals.ts";
 import styles from "./Status.module.css";
 
 export function Status() {
-  const phase = statusPhase.value;
-  const disconnected = isDisconnected.value;
+  return (
+    <StatusView
+      phase={statusPhase.value}
+      disconnected={isDisconnected.value}
+    />
+  );
+}
 
+export function StatusView(
+  { phase, disconnected }: { phase: Phase; disconnected: boolean },
+) {
   const [dots, setDots] = useState(0);
 
   useEffect(() => {

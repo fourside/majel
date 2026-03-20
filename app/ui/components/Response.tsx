@@ -3,10 +3,22 @@ import { lastTranscription, responseError, responseText } from "../signals.ts";
 import styles from "./Response.module.css";
 
 export function Response() {
-  const user = lastTranscription.value;
-  const text = responseText.value;
-  const error = responseError.value;
+  return (
+    <ResponseView
+      user={lastTranscription.value}
+      text={responseText.value}
+      error={responseError.value}
+    />
+  );
+}
 
+export function ResponseView(
+  { user, text, error }: {
+    user: string;
+    text: string | null;
+    error: string | null;
+  },
+) {
   return (
     <div class={styles.response}>
       {user && <div class={styles.user}>{user}</div>}
