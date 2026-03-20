@@ -15,6 +15,43 @@ const mockSensors: SensorData = {
   lightHistory: [80, 90, 120, 150, 200, 180, 160, 140, 100, 80, 60, 50],
 };
 
+function DashboardPreview() {
+  return (
+    <div
+      class="dashboard"
+      style={{
+        width: "800px",
+        height: "480px",
+        overflow: "hidden",
+        border: "1px solid var(--color-border)",
+        borderRadius: "8px",
+      }}
+    >
+      <div class="top-bar">
+        <Clock />
+        <div class="weather">
+          <WeatherView
+            date="3 / 21 Fri"
+            weather={{ weatherCode: 3, temperature: 18 }}
+          />
+        </div>
+      </div>
+      <div class="middle">
+        <SensorsView data={mockSensors} />
+      </div>
+      <TimerView timer={{ active: true, label: "パスタ", remainingSec: 142 }} />
+      <ResponseView
+        user="きょうの天気は？"
+        text="きょうのかわさきのてんきは、くもりです。きおんは じゅうはちど、しつどは よんじゅうはちパーセントです。"
+        error={null}
+      />
+      <div class="status-bar">
+        <StatusView phase="done" disconnected={false} />
+      </div>
+    </div>
+  );
+}
+
 function Catalog() {
   return (
     <div
@@ -34,6 +71,10 @@ function Catalog() {
       >
         MAJEL Component Catalog
       </h1>
+
+      <CatalogItem title="Dashboard (800x480 integrated layout)">
+        <DashboardPreview />
+      </CatalogItem>
 
       <CatalogItem title="Clock">
         <Clock />
