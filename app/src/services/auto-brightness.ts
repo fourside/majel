@@ -11,10 +11,10 @@ import { getSensorData } from "./sensors.ts";
  *   > 500 lx  直射日光・窓際        100%
  */
 export function luxToPercent(lux: number): number {
-  if (lux < 10) return 15;
+  if (lux < 10) return 25;
   if (lux > 500) return 100;
   const ratio = (Math.log(lux) - Math.log(10)) / (Math.log(500) - Math.log(10));
-  return Math.round(15 + ratio * 85);
+  return Math.round(25 + ratio * 75);
 }
 
 let timerId: number | undefined;
