@@ -5,7 +5,7 @@ import { getSensorData } from "../services/sensors.ts";
 import { chat, clearHistory } from "../services/llm.ts";
 import { transcribe } from "../services/stt.ts";
 import { synthesize } from "../services/tts.ts";
-import { playResponse, record } from "../services/audio.ts";
+import { record } from "../services/audio.ts";
 import * as audioPlayer from "../services/audio-player.ts";
 import { getBrightness, setBrightness, setPower } from "../services/display.ts";
 import { suppressAutoBrightness } from "../services/auto-brightness.ts";
@@ -81,8 +81,6 @@ apiRoutes.post("/voice", async (c) => {
     console.log(
       `[voice] transcribe: ${transcribeMs}ms, chat: ${chatMs}ms, synthesize: ${synthesizeMs}ms, total: ${totalMs}ms`,
     );
-
-    playResponse(audioBytes);
 
     const audioBase64 = encodeBase64(audioBytes);
     return c.json({
