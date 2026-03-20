@@ -7,8 +7,8 @@ resources:
 
 images:
   - name: ghcr.io/fourside/majel-app
-    newTag: "18d14516b92960426c8b5824fca227c1eff3a129"
+    newTag: "8d5c4500e9e330552fe3a7eddb4517bafa27b10c"
   - name: ghcr.io/fourside/majel-sensors
-    newTag: "18d14516b92960426c8b5824fca227c1eff3a129"
+    newTag: "8d5c4500e9e330552fe3a7eddb4517bafa27b10c"
   - name: ghcr.io/fourside/majel-recorder
-    newTag: "18d14516b92960426c8b5824fca227c1eff3a129"
+    newTag: "8d5c4500e9e330552fe3a7eddb4517bafa27b10c"
