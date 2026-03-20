@@ -105,7 +105,7 @@ def record_utterance(mic: alsaaudio.PCM, initial_frame: bytes | None = None) -> 
     return WAV_OUTPUT
 
 
-PLAYBACK_DEVICE = os.environ.get("ALSA_PLAYBACK_DEVICE", "plughw:2,0")
+PLAYBACK_DEVICE = os.environ.get("ALSA_PLAYBACK_DEVICE", "softvol")
 RESPONSE_WAV = Path("/tmp/majel/response.wav")
 
 
