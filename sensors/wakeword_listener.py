@@ -26,6 +26,7 @@ FRAME_SIZE = 1280  # 80ms at 16kHz
 RECORD_SILENCE_TIMEOUT = 2.0  # seconds of silence to stop recording
 RECORD_MAX_DURATION = 10.0  # max recording duration in seconds
 VAD_ENERGY_THRESHOLD = 500  # RMS threshold for voice activity
+PLAYBACK_COOLDOWN = 1.0  # seconds to discard mic input after TTS playback
 FOLLOWUP_TIMEOUT = 5.0  # seconds to wait for follow-up speech after response
 FOLLOWUP_MAX_TURNS = 5  # max follow-up turns before requiring wakeword again
 APP_URL = os.environ.get("APP_URL", "http://localhost:3000")
@@ -123,12 +124,17 @@ def play_wav(wav_path: Path) -> None:
         print("[wakeword] aplay not found, skipping playback", file=sys.stderr)
 
 
-def drain_mic_buffer(mic: alsaaudio.PCM, model: Model) -> None:
-    """Discard buffered audio and reset wakeword model."""
+def drain_mic_buffer(mic: alsaaudio.PCM, model: Model, duration: float = 0) -> None:
+    """Discard buffered audio and reset wakeword model.
+
+    If duration > 0, keep draining for that many seconds to let speaker
+    echo / reverb die out before resuming detection.
+    """
     model.reset()
+    deadline = time.monotonic() + duration
     while True:
         n, _ = mic.read()
-        if n <= 0:
+        if n <= 0 and time.monotonic() >= deadline:
             break
 
 
@@ -222,7 +228,7 @@ def main() -> None:
                 for turn in range(1 + FOLLOWUP_MAX_TURNS):
                     wav_path = record_utterance(mic, initial_frame=first_frame)
                     trigger_voice_pipeline(wav_path)
-                    drain_mic_buffer(mic, model)
+                    drain_mic_buffer(mic, model, duration=PLAYBACK_COOLDOWN)
 
                     if turn >= FOLLOWUP_MAX_TURNS:
                         print("[wakeword] Max follow-up turns reached")
