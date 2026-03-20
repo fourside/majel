@@ -12,6 +12,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
 
 WORKDIR /app
 COPY --from=builder /app/ .
-COPY --from=builder /root/.cache/deno /root/.cache/deno
+COPY --from=builder /deno-dir/ /deno-dir/
 
 ENTRYPOINT ["deno", "task", "record"]
