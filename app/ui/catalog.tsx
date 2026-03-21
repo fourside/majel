@@ -164,7 +164,7 @@ function Catalog() {
             >
               disconnected
             </span>
-            <StatusView phase="done" disconnected={true} />
+            <StatusView phase="done" disconnected />
           </div>
         </div>
       </CatalogItem>

@@ -133,8 +133,8 @@ def drain_mic_buffer(mic: alsaaudio.PCM, model: Model, duration: float = 0) -> N
     model.reset()
     deadline = time.monotonic() + duration
     while True:
-        n, _ = mic.read()
-        if n <= 0 and time.monotonic() >= deadline:
+        mic.read()
+        if time.monotonic() >= deadline:
             break
 
 
