@@ -1,12 +1,12 @@
 import { assertEquals } from "jsr:@std/assert";
-import { phaseLabels, phaseToLabel } from "./status.js";
+import { phaseLabels, phaseToLabel } from "./status.ts";
 
 Deno.test("phaseToLabel > known phase returns label", () => {
-  assertEquals(phaseToLabel("listening"), "聞き取り中...");
+  assertEquals(phaseToLabel("listening"), "ききとりちゅう...");
 });
 
-Deno.test("phaseToLabel > done returns 待機中", () => {
-  assertEquals(phaseToLabel("done"), "待機中");
+Deno.test("phaseToLabel > done returns たいきちゅう", () => {
+  assertEquals(phaseToLabel("done"), "たいきちゅう");
 });
 
 Deno.test("phaseToLabel > unknown phase returns phase string", () => {

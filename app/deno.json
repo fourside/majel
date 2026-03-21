@@ -25,7 +25,7 @@
   "tasks": {
     "start": "deno run --allow-all src/main.ts",
     "build": "deno run --allow-all ui/build.ts",
-    "dev": "deno run --allow-all ui/build.ts --watch",
+    "dev": "deno run --allow-all ui/build.ts --watch & deno run --watch --allow-all src/main.ts",
     "record": "deno run --allow-run --allow-write --allow-read scripts/01_record.ts",
     "transcribe": "deno run --allow-read --allow-net --allow-env scripts/02_transcribe.ts",
     "chat": "deno run --allow-net --allow-env --allow-read scripts/03_chat.ts",

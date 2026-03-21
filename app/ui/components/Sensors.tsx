@@ -1,8 +1,6 @@
 import { type SensorData, sensorData } from "../signals.ts";
-// @ts-types="../../static/lib/format.js"
-import { formatSensorParts } from "../../static/lib/format.js";
-// @ts-types="../../static/lib/graph.js"
-import { calculateBars } from "../../static/lib/graph.js";
+import { formatSensorParts } from "../../static/lib/format.ts";
+import { calculateBars } from "../../static/lib/graph.ts";
 import styles from "./Sensors.module.css";
 
 export function Sensors() {
@@ -11,53 +9,49 @@ export function Sensors() {
 
 export function SensorsView({ data }: { data: SensorData | null }) {
   const history = data?.lightHistory ?? null;
-  const recent = history && history.length > 32 ? history.slice(-32) : history;
+  const recent = history && history.length > 16 ? history.slice(-16) : history;
   const bars = calculateBars(recent);
 
   return (
-    <>
-      <div class={styles.row}>
-        <div class={styles.item}>
-          <span
-            class={styles.icon}
-            dangerouslySetInnerHTML={{ __html: ICON_TEMP }}
-          />
-          <SensorValue value={data?.temperature} unit="°C" decimals={1} />
-        </div>
-        <div class={styles.item}>
-          <span
-            class={styles.icon}
-            dangerouslySetInnerHTML={{ __html: ICON_HUMIDITY }}
-          />
-          <SensorValue value={data?.humidity} unit="%" />
-        </div>
-        <div class={styles.item}>
-          <span
-            class={styles.icon}
-            dangerouslySetInnerHTML={{ __html: ICON_PRESSURE }}
-          />
-          <SensorValue value={data?.pressure} unit="hPa" />
-        </div>
+    <div class={styles.row}>
+      <div class={styles.item}>
+        <span
+          class={styles.icon}
+          dangerouslySetInnerHTML={{ __html: ICON_TEMP }}
+        />
+        <SensorValue value={data?.temperature} unit="°C" decimals={1} />
       </div>
-      <div class={styles.row}>
-        <div class={styles.item}>
-          <span
-            class={styles.icon}
-            dangerouslySetInnerHTML={{ __html: ICON_LIGHT }}
-          />
-          <SensorValue value={data?.light} unit="lx" />
-        </div>
-        <div class={styles.graph}>
-          {bars.map((bar: { height: number; dim: boolean }, i: number) => (
-            <div
-              key={i}
-              class={`${styles.bar}${bar.dim ? ` ${styles.dim}` : ""}`}
-              style={{ height: `${bar.height}px` }}
-            />
-          ))}
-        </div>
+      <div class={styles.item}>
+        <span
+          class={styles.icon}
+          dangerouslySetInnerHTML={{ __html: ICON_HUMIDITY }}
+        />
+        <SensorValue value={data?.humidity} unit="%" />
       </div>
-    </>
+      <div class={styles.item}>
+        <span
+          class={styles.icon}
+          dangerouslySetInnerHTML={{ __html: ICON_PRESSURE }}
+        />
+        <SensorValue value={data?.pressure} unit="hPa" />
+      </div>
+      <div class={styles.item}>
+        <span
+          class={styles.icon}
+          dangerouslySetInnerHTML={{ __html: ICON_LIGHT }}
+        />
+        <SensorValue value={data?.light} unit="lx" />
+      </div>
+      <div class={styles.graph}>
+        {bars.map((bar: { height: number; dim: boolean }, i: number) => (
+          <div
+            key={i}
+            class={`${styles.bar}${bar.dim ? ` ${styles.dim}` : ""}`}
+            style={{ height: `${bar.height}px` }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 

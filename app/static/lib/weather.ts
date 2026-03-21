@@ -1,5 +1,4 @@
-/** WMO weather code → icon image path */
-const wmoIconPaths = {
+const wmoIconPaths: Record<number, string> = {
   0: "/images/weather/sunny.gif",
   1: "/images/weather/partly-cloudy.gif",
   2: "/images/weather/mostly-cloudy.gif",
@@ -22,12 +21,10 @@ const wmoIconPaths = {
   99: "/images/weather/thunder.gif",
 };
 
-/** @param {number} code */
-export function wmoCodeToIcon(code) {
+export function wmoCodeToIcon(code: number): string {
   return wmoIconPaths[code] ?? "/images/weather/cloudy.gif";
 }
 
-/** @param {number} temp */
-export function formatTemperature(temp) {
+export function formatTemperature(temp: number): string {
   return Math.round(temp) + "°C";
 }

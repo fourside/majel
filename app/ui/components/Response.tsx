@@ -21,7 +21,13 @@ export function ResponseView(
 ) {
   return (
     <div class={styles.response}>
-      {user && <div class={styles.user}>{user}</div>}
+      {user && (
+        <div class={styles.userRow}>
+          <img class={styles.avatar} src="/images/ananuke.gif" alt="" />
+          <span class={styles.marker}>◆</span>
+          <div class={styles.user}>{user}</div>
+        </div>
+      )}
       {text && <Typewriter text={text} />}
       {error && <div class={styles.error}>{error}</div>}
     </div>
@@ -32,8 +38,12 @@ function Typewriter({ text }: { text: string }) {
   const { displayed, done } = useTypewriter(text);
 
   return (
-    <div class={`${styles.text}${done ? "" : ` ${styles.typing}`}`}>
-      {displayed}
+    <div class={styles.assistant}>
+      <img class={styles.avatar} src="/images/yudan_robo.gif" alt="" />
+      <span class={styles.marker}>◆</span>
+      <div class={`${styles.text}${done ? "" : ` ${styles.typing}`}`}>
+        {displayed}
+      </div>
     </div>
   );
 }
