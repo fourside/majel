@@ -161,8 +161,11 @@ def wait_for_followup(mic: alsaaudio.PCM) -> bytes | None:
     return None
 
 
-def trigger_voice_pipeline(wav_path: Path) -> None:
-    """Send recorded WAV to app's voice endpoint and play response."""
+def trigger_voice_pipeline(wav_path: Path) -> bool:
+    """Send recorded WAV to app's voice endpoint and play response.
+
+    Returns True if follow-up should be skipped (e.g. news playback started).
+    """
     try:
         print(f"[wakeword] Triggering voice pipeline: {wav_path}")
         resp = httpx.post(
@@ -180,10 +183,13 @@ def trigger_voice_pipeline(wav_path: Path) -> None:
                 RESPONSE_WAV.parent.mkdir(parents=True, exist_ok=True)
                 RESPONSE_WAV.write_bytes(base64.b64decode(audio_b64))
                 play_wav(RESPONSE_WAV)
+
+            return bool(data.get("skipFollowup", False))
         else:
             print(f"[wakeword] Voice API error: {resp.status_code}", file=sys.stderr)
     except httpx.HTTPError as e:
         print(f"[wakeword] Connection error: {e}", file=sys.stderr)
+    return False
 
 
 def main() -> None:
@@ -227,9 +233,12 @@ def main() -> None:
                 first_frame: bytes | None = None
                 for turn in range(1 + FOLLOWUP_MAX_TURNS):
                     wav_path = record_utterance(mic, initial_frame=first_frame)
-                    trigger_voice_pipeline(wav_path)
+                    skip = trigger_voice_pipeline(wav_path)
                     drain_mic_buffer(mic, model, duration=PLAYBACK_COOLDOWN)
 
+                    if skip:
+                        print("[wakeword] Skipping follow-up (audio playback active)")
+                        break
                     if turn >= FOLLOWUP_MAX_TURNS:
                         print("[wakeword] Max follow-up turns reached")
                         break

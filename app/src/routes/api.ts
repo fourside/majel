@@ -83,10 +83,12 @@ apiRoutes.post("/voice", async (c) => {
     );
 
     const audioBase64 = encodeBase64(audioBytes);
+    const skipFollowup = audioPlayer.getPlaybackState() === "playing";
     return c.json({
       transcription: text,
       response,
       audio: audioBase64,
+      skipFollowup,
     });
   } catch (e) {
     console.error("voice error:", e);
