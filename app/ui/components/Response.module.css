@@ -6,13 +6,33 @@
   gap: 0.75rem;
 }
 
+.userRow {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 8px;
+  align-items: center;
+  color: var(--color-user);
+}
+
+.marker {
+  line-height: 1;
+}
+
 .user {
   font-size: var(--font-body);
   color: var(--color-user);
 }
 
-.user::before {
-  content: "\01F5E3 ";
+.assistant {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 8px;
+  align-items: center;
+  color: var(--color-assistant);
+}
+
+.avatar {
+  image-rendering: pixelated;
 }
 
 .text {

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-// @ts-types="../../static/lib/status.js"
-import { phaseToLabel } from "../../static/lib/status.js";
+import { phaseToLabel } from "../../static/lib/status.ts";
 import { isDisconnected, type Phase, statusPhase } from "../signals.ts";
 import styles from "./Status.module.css";
 

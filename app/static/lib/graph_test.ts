@@ -1,5 +1,5 @@
 import { assertEquals } from "jsr:@std/assert";
-import { calculateBars } from "./graph.js";
+import { calculateBars } from "./graph.ts";
 
 Deno.test("calculateBars > null returns 24 dim bars", () => {
   const bars = calculateBars(null);

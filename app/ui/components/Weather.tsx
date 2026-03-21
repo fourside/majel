@@ -1,6 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-// @ts-types="../../static/lib/weather.js"
-import { formatTemperature, wmoCodeToIcon } from "../../static/lib/weather.js";
+import { formatTemperature, wmoCodeToIcon } from "../../static/lib/weather.ts";
 import styles from "./Weather.module.css";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -15,10 +14,7 @@ export function Weather() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
 
   useEffect(() => {
-    const timer = setInterval(
-      () => setDate(formatDate(new Date())),
-      60_000,
-    );
+    const timer = setInterval(() => setDate(formatDate(new Date())), 60_000);
     return () => clearInterval(timer);
   }, []);
 
@@ -34,9 +30,13 @@ export function Weather() {
   return <WeatherView date={date} weather={weather} />;
 }
 
-export function WeatherView(
-  { date, weather }: { date: string; weather: WeatherData | null },
-) {
+export function WeatherView({
+  date,
+  weather,
+}: {
+  date: string;
+  weather: WeatherData | null;
+}) {
   const iconSrc = weather ? wmoCodeToIcon(weather.weatherCode) : "";
   const iconAlt = weather ? `weather-${weather.weatherCode}` : "--";
   const temp = weather ? formatTemperature(weather.temperature) : "--°C";
@@ -59,7 +59,7 @@ export function WeatherView(
 }
 
 function formatDate(d: Date): string {
-  return `${d.getMonth() + 1} / ${d.getDate()} ${WEEKDAYS[d.getDay()]}`;
+  return `${d.getMonth() + 1}/${d.getDate()} ${WEEKDAYS[d.getDay()]}`;
 }
 
 async function fetchWeather(): Promise<WeatherData | null> {

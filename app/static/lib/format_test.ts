@@ -1,5 +1,5 @@
 import { assertEquals } from "jsr:@std/assert";
-import { formatSensorValue } from "./format.js";
+import { formatSensorValue } from "./format.ts";
 
 // ── formatSensorValue ──
 

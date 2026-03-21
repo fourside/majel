@@ -22,11 +22,11 @@
   font-weight: 400;
   color: var(--color-text-muted);
   letter-spacing: 0.1em;
-  margin-bottom: 8px;
+  margin-bottom: 24px;
 }
 
 .time {
-  font-size: 8rem;
+  font-size: 3rem;
   font-weight: 200;
   color: var(--color-accent);
   letter-spacing: 0.05em;

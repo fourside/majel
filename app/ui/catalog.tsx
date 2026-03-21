@@ -1,11 +1,13 @@
 import { render } from "preact";
+import { useState } from "preact/hooks";
 import { Clock } from "./components/Clock.tsx";
-import { WeatherView } from "./components/Weather.tsx";
-import { SensorsView } from "./components/Sensors.tsx";
 import { ResponseView } from "./components/Response.tsx";
-import { TimerView } from "./components/Timer.tsx";
+import { SensorsView } from "./components/Sensors.tsx";
 import { StatusView } from "./components/Status.tsx";
-import type { SensorData } from "./signals.ts";
+import { TimerView } from "./components/Timer.tsx";
+import { WeatherView } from "./components/Weather.tsx";
+import type { Phase, SensorData } from "./signals.ts";
+import hourlyStyles from "./components/HourlyAnnounce.module.css";
 
 const mockSensors: SensorData = {
   temperature: 22.3,
@@ -15,138 +17,135 @@ const mockSensors: SensorData = {
   lightHistory: [80, 90, 120, 150, 200, 180, 160, 140, 100, 80, 60, 50],
 };
 
-function DashboardPreview() {
-  return (
-    <div
-      class="dashboard"
-      style={{
-        width: "800px",
-        height: "480px",
-        overflow: "hidden",
-        border: "1px solid var(--color-border)",
-        borderRadius: "8px",
-      }}
-    >
-      <div class="top-bar">
-        <Clock />
-        <div class="weather">
-          <WeatherView
-            date="3 / 21 Fri"
-            weather={{ weatherCode: 3, temperature: 18 }}
-          />
-        </div>
-      </div>
-      <div class="middle">
-        <SensorsView data={mockSensors} />
-      </div>
-      <TimerView timer={{ active: true, label: "パスタ", remainingSec: 142 }} />
-      <ResponseView
-        user="きょうの天気は？"
-        text="きょうのかわさきのてんきは、くもりです。きおんは じゅうはちど、しつどは よんじゅうはちパーセントです。"
-        error={null}
-      />
-      <div class="status-bar">
-        <StatusView phase="done" disconnected={false} />
-      </div>
-    </div>
-  );
-}
-
-function Catalog() {
-  return (
-    <div
-      style={{
-        padding: "16px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "24px",
-      }}
-    >
-      <h1
+const entries: { name: string; render: () => preact.ComponentChildren }[] = [
+  {
+    name: "Dashboard",
+    render: () => (
+      <div
+        class="dashboard"
         style={{
-          color: "var(--color-accent)",
-          fontSize: "1.2rem",
-          margin: 0,
+          width: "800px",
+          height: "480px",
+          overflow: "hidden",
+          border: "1px solid var(--color-border)",
+          borderRadius: "8px",
         }}
       >
-        MAJEL Component Catalog
-      </h1>
-
-      <CatalogItem title="Dashboard (800x480 integrated layout)">
-        <DashboardPreview />
-      </CatalogItem>
-
-      <CatalogItem title="Clock">
-        <Clock />
-      </CatalogItem>
-
-      <CatalogItem title="Weather">
-        <div class="weather">
-          <WeatherView
-            date="3 / 20 Fri"
-            weather={{ weatherCode: 0, temperature: 22 }}
-          />
+        <div class="top-bar">
+          <Clock />
+          <div class="weather">
+            <WeatherView
+              date="3/21 Fri"
+              weather={{ weatherCode: 3, temperature: 18 }}
+            />
+          </div>
         </div>
-      </CatalogItem>
-
-      <CatalogItem title="Weather (loading)">
-        <div class="weather">
-          <WeatherView date="3 / 20 Fri" weather={null} />
+        <div class="middle">
+          <SensorsView data={mockSensors} />
         </div>
-      </CatalogItem>
-
-      <CatalogItem title="Sensors">
-        <SensorsView data={mockSensors} />
-      </CatalogItem>
-
-      <CatalogItem title="Sensors (no data)">
-        <SensorsView data={null} />
-      </CatalogItem>
-
-      <CatalogItem title="Response (typewriter)">
-        <ResponseView
-          user="きょうの天気は？"
-          text="きょうのかわさきのてんきは、はれです。きおんは にじゅうにど、しつどは よんじゅうはちパーセントです。"
-          error={null}
-        />
-      </CatalogItem>
-
-      <CatalogItem title="Response (error)">
-        <ResponseView
-          user="テスト"
-          text={null}
-          error="すみません、接続に問題があるようです。"
-        />
-      </CatalogItem>
-
-      <CatalogItem title="Timer (active)">
         <TimerView
           timer={{ active: true, label: "パスタ", remainingSec: 142 }}
         />
-      </CatalogItem>
-
-      <CatalogItem title="Timer (inactive)">
-        <TimerView timer={null} />
-      </CatalogItem>
-
-      <CatalogItem title="Status (variants)">
+        <ResponseView
+          user="きょうのてんきは？"
+          text="きょうのかわさきのてんきは、くもりです。きおんは じゅうはちど、しつどは よんじゅうはちパーセントです。"
+          error={null}
+        />
+        <div class="status-bar">
+          <StatusView phase="done" disconnected={false} />
+        </div>
+      </div>
+    ),
+  },
+  {
+    name: "Clock",
+    render: () => <Clock />,
+  },
+  {
+    name: "Weather",
+    render: () => (
+      <div class="weather">
+        <WeatherView
+          date="3/21 Fri"
+          weather={{ weatherCode: 0, temperature: 22 }}
+        />
+      </div>
+    ),
+  },
+  {
+    name: "Weather (loading)",
+    render: () => (
+      <div class="weather">
+        <WeatherView date="3/21 Fri" weather={null} />
+      </div>
+    ),
+  },
+  {
+    name: "Sensors",
+    render: () => <SensorsView data={mockSensors} />,
+  },
+  {
+    name: "Sensors (no data)",
+    render: () => <SensorsView data={null} />,
+  },
+  {
+    name: "Response",
+    render: () => (
+      <ResponseView
+        user="きょうのてんきは？"
+        text="きょうのかわさきのてんきは、はれです。きおんは にじゅうにど、しつどは よんじゅうはちパーセントです。"
+        error={null}
+      />
+    ),
+  },
+  {
+    name: "Response (error)",
+    render: () => (
+      <ResponseView
+        user="テスト"
+        text={null}
+        error="すみません、接続に問題があるようです。"
+      />
+    ),
+  },
+  {
+    name: "Timer",
+    render: () => (
+      <TimerView
+        timer={{ active: true, label: "パスタ", remainingSec: 142 }}
+      />
+    ),
+  },
+  {
+    name: "Status",
+    render: () => {
+      const phases: Phase[] = [
+        "done",
+        "listening",
+        "transcribing",
+        "thinking",
+        "speaking",
+      ];
+      return (
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
+            display: "grid",
             gap: "12px",
           }}
         >
-          {(["done", "listening", "thinking", "speaking"] as const).map((p) => (
+          {phases.map((p) => (
             <div
               key={p}
-              style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "80px auto",
+                alignItems: "center",
+              }}
             >
               <span
                 style={{
                   color: "var(--color-text-muted)",
                   fontSize: "0.7rem",
-                  width: "80px",
                 }}
               >
                 {p}
@@ -154,12 +153,17 @@ function Catalog() {
               <StatusView phase={p} disconnected={false} />
             </div>
           ))}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "80px auto",
+              alignItems: "center",
+            }}
+          >
             <span
               style={{
                 color: "var(--color-text-muted)",
                 fontSize: "0.7rem",
-                width: "80px",
               }}
             >
               disconnected
@@ -167,65 +171,97 @@ function Catalog() {
             <StatusView phase="done" disconnected />
           </div>
         </div>
-      </CatalogItem>
-
-      <CatalogItem title="HourlyAnnounce (preview)">
-        <div
-          style={{
-            position: "relative",
-            width: "400px",
-            height: "240px",
-            background: "var(--color-bg)",
-            borderRadius: "8px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "0.75rem",
-              color: "var(--color-text-muted)",
-              letterSpacing: "0.1em",
-              marginBottom: "8px",
-            }}
-          >
-            03/20 FRI
-          </div>
-          <div
-            style={{
-              fontSize: "4rem",
-              fontWeight: 200,
-              color: "var(--color-accent)",
-              letterSpacing: "0.05em",
-            }}
-          >
-            13:00
-          </div>
-        </div>
-      </CatalogItem>
-    </div>
-  );
-}
-
-function CatalogItem(
-  { title, children }: { title: string; children: preact.ComponentChildren },
-) {
-  return (
-    <div>
+      );
+    },
+  },
+  {
+    name: "HourlyAnnounce",
+    render: () => (
       <div
+        class={hourlyStyles.overlay}
         style={{
-          fontSize: "0.75rem",
-          color: "var(--color-text-muted)",
-          marginBottom: "8px",
-          borderBottom: "1px solid var(--color-border)",
-          paddingBottom: "4px",
+          position: "relative",
+          width: "800px",
+          height: "480px",
+          opacity: 1,
+          borderRadius: "8px",
+          border: "1px solid var(--color-border)",
         }}
       >
-        {title}
+        <div class={hourlyStyles.date}>03/21 FRI</div>
+        <div class={hourlyStyles.time}>13:00</div>
       </div>
-      {children}
+    ),
+  },
+];
+
+function Catalog() {
+  const [selected, setSelected] = useState(0);
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "200px 1fr",
+        height: "100vh",
+      }}
+    >
+      <nav
+        style={{
+          borderRight: "1px solid var(--color-border)",
+          padding: "12px 0",
+          overflowY: "auto",
+        }}
+      >
+        <div
+          style={{
+            padding: "0 12px 12px",
+            fontSize: "0.8rem",
+            color: "var(--color-accent)",
+            fontWeight: 700,
+          }}
+        >
+          MAJEL Catalog
+        </div>
+        {entries.map((entry, i) => (
+          <button
+            type="button"
+            key={entry.name}
+            onClick={() => setSelected(i)}
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "6px 12px",
+              border: "none",
+              background: i === selected
+                ? "var(--color-bg-surface)"
+                : "transparent",
+              color: i === selected
+                ? "var(--color-accent)"
+                : "var(--color-text-muted)",
+              fontSize: "0.75rem",
+              textAlign: "left",
+              cursor: "pointer",
+            }}
+          >
+            {entry.name}
+          </button>
+        ))}
+      </nav>
+      <main style={{ padding: "16px", overflowY: "auto" }}>
+        <div
+          style={{
+            fontSize: "0.75rem",
+            color: "var(--color-text-muted)",
+            marginBottom: "12px",
+            borderBottom: "1px solid var(--color-border)",
+            paddingBottom: "4px",
+          }}
+        >
+          {entries[selected].name}
+        </div>
+        {entries[selected].render()}
+      </main>
     </div>
   );
 }

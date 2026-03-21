@@ -1,6 +1,6 @@
 .row {
   display: grid;
-  grid-template-columns: repeat(3, auto) 1fr;
+  grid-template-columns: repeat(5, auto);
   align-items: center;
   gap: 1.5rem;
 }
@@ -31,7 +31,7 @@
 .graph {
   display: flex;
   align-items: flex-end;
-  justify-self: end;
+  justify-self: start;
   gap: 1px;
   height: 30px;
   max-width: 200px;

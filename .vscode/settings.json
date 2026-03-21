@@ -1,4 +1,11 @@
 {
   "deno.enable": true,
-  "deno.enablePaths": ["app", "recorder"]
+  "deno.enablePaths": ["app", "recorder"],
+  "editor.defaultFormatter": "denoland.vscode-deno",
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  }
 }

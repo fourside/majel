@@ -1,5 +1,5 @@
 import { assertEquals } from "jsr:@std/assert";
-import { wmoCodeToIcon, formatTemperature } from "./weather.js";
+import { wmoCodeToIcon, formatTemperature } from "./weather.ts";
 
 // ── wmoCodeToIcon ──
 
