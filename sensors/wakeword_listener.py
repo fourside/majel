@@ -31,7 +31,7 @@ FOLLOWUP_TIMEOUT = 5.0  # seconds to wait for follow-up speech after response
 FOLLOWUP_MAX_TURNS = 5  # max follow-up turns before requiring wakeword again
 APP_URL = os.environ.get("APP_URL", "http://localhost:3000")
 WAV_OUTPUT = Path("/tmp/majel/wakeword_input.wav")
-AUDIO_DEVICE = os.environ.get("ALSA_CAPTURE_DEVICE", "plughw:3,0")
+AUDIO_DEVICE = os.environ.get("ALSA_CAPTURE_DEVICE", "plughw:Device_1,0")
 
 
 def open_mic_stream() -> alsaaudio.PCM:

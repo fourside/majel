@@ -7,10 +7,10 @@ data:
   asound.conf: |
     pcm.softvol {
       type softvol
-      slave.pcm "plughw:2,0"
+      slave.pcm "plughw:Device,0"
       control {
         name "SoftVolume"
-        card 2
+        card Device
       }
       min_dB -30.0
       max_dB 0.0
